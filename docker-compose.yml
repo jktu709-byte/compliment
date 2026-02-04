@@ -1,0 +1,24 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:18
+    restart: always
+    container_name: compliment_base
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    ports:
+      - 5432:5432
+  app:
+    build: 
+      context: ..
+      dockerfile: Dockerfile
+    
+    ports:
+      - 8000:8000
+    container_name: compliment
+    env_file:
+      - .env
+    depends_on:
+      - db
