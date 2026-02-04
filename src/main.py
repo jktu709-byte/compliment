@@ -1,3 +1,4 @@
+import time #noqa
 import asyncio #noqa
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
