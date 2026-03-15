@@ -7,7 +7,6 @@ import uvicorn
 app = FastAPI()
 app.add_middleware(CORSMiddleware,allow_origins = "*")
 
-compliment_app = app
 
 if __name__ == "__main__":
     # asyncio.run(main())

@@ -10,8 +10,8 @@ RUN poetry config virtualenvs.create false
 
 RUN poetry install --no-root --no-interaction
 
-COPY compliment_app /app/
+COPY . /app/
 
-EXPOSE 8000
+EXPOSE 8888
 
-CMD [ "poetry","run","uvicorn","compliment_app.main:app","--host","0.0.0.0","--port","8000" ]
+CMD [ "poetry","run","uvicorn","compliment_app.src.main:app","--host","0.0.0.0","--port","8888" ]
