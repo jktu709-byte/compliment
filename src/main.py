@@ -3,16 +3,16 @@ import asyncio #noqa
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn #noqa
-from src.api.CRUD import AsyncCREATE
-async def main():
-    app = FastAPI()
-    app.add_middleware(CORSMiddleware,allow_origins = "*")
-    
-    @app.post("Compliment/CreateBase")
-    async def AsCreate():
-        result = AsyncCREATE.create_tables()
-        await result
+from src.api.CRUD import Async
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await Async.create_tables()
+    yield
+
+app = FastAPI(lifespan=lifespan)
+app.add_middleware(CORSMiddleware,allow_origins = "*")
 
 if __name__ == "__main__":
-    asyncio.run(main())
     uvicorn.run(app = "src.main:app",host="0.0.0.0",reload=True,port=8000)

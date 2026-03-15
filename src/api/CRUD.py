@@ -1,6 +1,6 @@
 from src.models.models import Base
 from src.core.database import async_engine
-class AsyncCREATE():
+class Async():
     @staticmethod
     async def create_tables():
         async with async_engine.begin() as conn:
