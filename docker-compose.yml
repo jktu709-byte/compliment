@@ -4,10 +4,12 @@ services:
     image: postgres:18
     restart: always
     container_name: compliment_base
+    # Сборка 
     build:
-      context: src/core/
+      # Где искать Docker-образ
+      context: ..
     env_file:
-      - DB.env
+      - src/core/DB.env
     volumes:
       - postgres_data:/var/lib/postgresql
     ports:
