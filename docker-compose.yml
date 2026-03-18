@@ -4,8 +4,10 @@ services:
     image: postgres:18
     restart: always
     container_name: compliment_base
+    build:
+      context: src/core/
     env_file:
-      - .env
+      - DB.env
     volumes:
       - postgres_data:/var/lib/postgresql
     ports:
@@ -19,7 +21,7 @@ services:
       - 8000:8000
     container_name: compliment
     env_file:
-      - .env
+      - docker.env
     depends_on:
       - db
 volumes:

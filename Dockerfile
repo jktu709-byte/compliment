@@ -14,4 +14,4 @@ COPY . /app/
 
 EXPOSE 8888
 
-CMD [ "poetry","run","uvicorn","compliment_app.src.main:app","--host","0.0.0.0","--port","8888" ]
+CMD [ "poetry","run","uvicorn","src.main:app","--host","0.0.0.0","--port","8888" ]
