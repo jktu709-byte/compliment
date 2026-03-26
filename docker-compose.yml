@@ -4,10 +4,13 @@ services:
     image: postgres:18
     restart: always
     container_name: compliment_base
+    # Если база упадет, перезапуск
+    healthcheck: 
+      test: ["CMD-SHELL", "pg_isready -U compliment_user"]
+      interval: 3s
+      retries: 5
+
     # Сборка 
-    build:
-      # Где искать Docker-образ
-      context: ..
     env_file:
       - src/core/DB.env
     volumes:
@@ -16,15 +19,16 @@ services:
       - 5432:5432
   app:
     build: 
-      context: ..
-      dockerfile: Dockerfile
-    
+      context: C:\DEV\nothing\Compliment_app\
+      dockerfile: Dockerfile 
     ports:
       - 8000:8000
     container_name: compliment
     env_file:
-      - docker.env
+      - C:\DEV\nothing\Compliment_app\docker.env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      
 volumes:
   postgres_data:

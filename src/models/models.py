@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Annotated, Optional, TypeAlias #noqa
-from sqlalchemy import text,ForeignKey
+from sqlalchemy import String, text,ForeignKey,Enum as SEnum
 from sqlalchemy.orm import DeclarativeBase,mapped_column,Mapped
 from datetime import datetime
 
@@ -11,21 +11,22 @@ class Base(DeclarativeBase):
     ...
 
 #Насчет пола просто вьебу выпадающий список так будет проще
-class Gender(Enum):
+class Gender(str,Enum):
     male = "male"
     female = "female"
     neutral = "neutral"
 
 class Compliment(Base):
-    __tablename__ = "Compliments"
+    __tablename__ = "compliments"
     id:Mapped[intpk]
-    gender:Mapped[Gender|None]
-    title:Mapped[str]
-    meaning:Mapped[str]
-    created_at:Mapped[created]
+    gender:Mapped[Gender|None] =mapped_column(SEnum(Gender),nullable= True)
+    title:Mapped[str] =mapped_column(String,nullable= True)
+    meaning:Mapped[str] = mapped_column(String,nullable= True)
+    created_at:Mapped[created] = mapped_column(String,nullable= True)
+    history: Mapped[]
     
 class History(Base):
-    __tablename__ = "Recent Compliments"
+    __tablename__ = "history"
     id:Mapped[intpk]
     compliment_id:Mapped[int] = mapped_column(
         ForeignKey("Compliments.id",ondelete="CASCADE")

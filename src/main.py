@@ -1,14 +1,13 @@
-import time #noqa
 import asyncio #noqa
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn #noqa
-from src.api.CRUD import Async
+from src.api.CRUD import ComplimentCRUD
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await Async.create_tables()
+    await ComplimentCRUD.create_tables()
     yield
 
 app = FastAPI(lifespan=lifespan)
