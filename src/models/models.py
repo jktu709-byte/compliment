@@ -23,7 +23,7 @@ class Compliment(Base):
     title:Mapped[str] =mapped_column(String,nullable= True)
     meaning:Mapped[str] = mapped_column(String,nullable= True)
     created_at:Mapped[created] = mapped_column(String,nullable= True)
-    history: Mapped[]
+    history: Mapped[str] = mapped_column(String,nullable=True)
     
 class History(Base):
     __tablename__ = "history"

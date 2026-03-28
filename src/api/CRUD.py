@@ -1,32 +1,56 @@
-from src.models.models import Base
-from src.core.database import async_engine,async_session
+from typing import Sequence
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select,func,or_
+from src.models.models import Gender,Compliment,History
 class ComplimentCRUD():
-    def __init__(self, session:async_session) -> None:
-        self.session = async_session
+    def __init__(self,session:AsyncSession) -> None:
+        self.session = session
+    
+    async def create_compliment(self, title:str, gender:Gender|None, meaning:str,history:str) -> Compliment:
+        obj = Compliment(title=title,gender = gender,meaning = meaning,history = history)
+        self.session.add(obj)
+        await self.session.commit()
+        await self.session.refresh(obj)
+        return obj
+    
+    async def get_compliment(self,compliment_id:int)->Compliment|None:
+        res = await self.session.execute(select(Compliment).filter(Compliment.id == compliment_id))
+        return res.scalar_one_or_none()
+    
+    async def get_all_compliments(self)->Sequence[Compliment]:
+        res = await self.session.execute(select(Compliment))
+        return res.scalars().all()
+    
+    async def filter_compliment(self):
+        pass    
+    
+    async def change_compliment(self,compliment_id:int,**kwargs)-> Compliment|None:
+        obj = await self.get_compliment(compliment_id)
+        if not obj:
+            raise ValueError
+        for key, value in kwargs.items():
+            setattr(obj,key,value)
+        await self.session.commit()
+        await self.session.refresh(obj)
+        return obj 
+
+    async def random_compliment(self,gender:Gender)->Compliment|None:
+        stmt = select(Compliment)
         
-    async def create_tables(self):
-        async with async_engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
-            await conn.run_sync(Base.metadata.create_all)
-            async_engine.echo = True
-    # Хотел написать перезапуск базы но по итогу решил запустить это в контейнере
-    # @staticmethod
-    # async def wait_db():
-    #         pass
-    async def insert_data(self):
-        pass
-    
-    async def get_data(self):
-        pass
-    
-    async def filter_data(self):
-        pass
-    
-    async def change_data(self):
-        pass
-    
-    async def delete_data(self):
-        pass
+        if gender:
+            stmt = stmt.filter(or_(Compliment.gender == gender,Compliment.gender.is_(None)))
+        
+        stmt = stmt.order_by(func.random()).limit(1)
+        res = await self.session.execute(stmt)
+        return res.scalar_one_or_none() 
+            
+    async def delete_compliment(self,compliment_id:int)->bool:
+        obj = await self.get_compliment(compliment_id)
+        if not obj:
+            return False
+        await self.session.delete(obj)
+        await self.session.commit()
+        return True
     
     
             
