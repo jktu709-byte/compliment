@@ -1,7 +1,11 @@
 from typing import Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select,func,or_
-from src.models.models import Gender,Compliment,History
+from src.models.models import Gender,Compliment,History #noqa
+
+# Мой класс отвечает за огромное количество вещей. Это как-то не по SRP.Разберись с этим
+# Наследование? Подкласс? Отдельные модули? Вынести рандом в бизнес логику, ведь это не crud
+# Все калссы могут коммитить. Отделный класс под сохранение? Прописать атрибут в __init__?
 class ComplimentCRUD():
     def __init__(self,session:AsyncSession) -> None:
         self.session = session
@@ -21,13 +25,11 @@ class ComplimentCRUD():
         res = await self.session.execute(select(Compliment))
         return res.scalars().all()
     
-    async def filter_compliment(self):
-        pass    
-    
-    async def change_compliment(self,compliment_id:int,**kwargs)-> Compliment|None:
+    async def update_compliment(self,compliment_id:int,**kwargs)-> Compliment|None:
         obj = await self.get_compliment(compliment_id)
         if not obj:
-            raise ValueError
+            return None
+        # проблема безопасности
         for key, value in kwargs.items():
             setattr(obj,key,value)
         await self.session.commit()
@@ -52,5 +54,4 @@ class ComplimentCRUD():
         await self.session.commit()
         return True
     
-    
-            
+   
