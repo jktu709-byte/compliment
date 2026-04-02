@@ -7,6 +7,7 @@ from datetime import datetime
 intpk: TypeAlias = Annotated[int,mapped_column(primary_key=True)]
 created:TypeAlias = Annotated[datetime,
                               mapped_column(server_default=text("TIMEZONE('utc',now())"))]
+nullable_string = Annotated[String,mapped_column(nullable= True)]
 class Base(DeclarativeBase):
     ...
 
@@ -20,18 +21,20 @@ class Compliment(Base):
     __tablename__ = "compliments"
     id:Mapped[intpk]
     gender:Mapped[Gender|None] =mapped_column(SEnum(Gender),nullable= True)
-    title:Mapped[str] =mapped_column(String,nullable= True)
-    meaning:Mapped[str] = mapped_column(String,nullable= True)
-    created_at:Mapped[created] = mapped_column(String,nullable= True)
-    history: Mapped[str] = mapped_column(String,nullable=True)
+    title:Mapped[nullable_string] 
+    point:Mapped[nullable_string] 
+    created_at:Mapped[created] 
+    # history: Mapped[str] = mapped_column(String,nullable=True)
     
-class History(Base):
-    __tablename__ = "history"
-    id:Mapped[intpk]
-    compliment_id:Mapped[int] = mapped_column(
-        ForeignKey("Compliments.id",ondelete="CASCADE")
-    )
-    user_gender:Mapped[Gender]
-    created_at:Mapped[created]
+# class History(Base):
+#     __tablename__ = "history"
+#     id:Mapped[intpk]
+#     compliment_id:Mapped[int] = mapped_column(
+#         ForeignKey("Compliments.id",ondelete="CASCADE")
+#     )
+#     # прописать relationship
+#     user_gender:Mapped[Gender]
+    
+#     created_at:Mapped[created]
     
 #В планах добавить табличку Context, где будут обьяснятся примеры и контекст

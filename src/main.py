@@ -2,7 +2,6 @@ import asyncio #noqa
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn #noqa
-from src.api.crud import ComplimentCRUD #noqa
 from contextlib import asynccontextmanager #noqa
 
 # @asynccontextmanager
