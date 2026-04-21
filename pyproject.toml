@@ -1,13 +1,14 @@
 [tool.poetry]
-name = "compliment"
+name = "compliment-app"
 version = "0.1.0"
-description = "Very simple compliment app"
-authors = ["Max"]
+description = ""
+authors = ["test <test@example.com>"]
 readme = "README.md"
-packages = [{ include = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.12"
+sqlalchemy = "^2.0.49"
+fastapi = "^0.135.3"
 
 
 [build-system]

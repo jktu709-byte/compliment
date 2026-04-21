@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-from models.models import Gender
+from src.models.comp_models import Gender
 
 class ComplimentSchema(BaseModel):
     title:str

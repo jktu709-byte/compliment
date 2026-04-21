@@ -1,7 +1,7 @@
 from typing import Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select,func,or_ #noqa
-from src.models.models import Gender,Compliment#noqa
+from src.models.comp_models import Gender,Compliment,Users,History#noqa
 from src.schemas.schemas import ComplimentSchema
 # Мой класс отвечает за огромное количество вещей. Это как-то не по SRP.Разберись с этим
 # Вынести рандом в бизнес логику.
@@ -13,9 +13,6 @@ class ComplimentRepository():
     async def create_compliment(self, title:str, gender:Gender|None, point:str,history:str) -> Compliment:
         obj = Compliment(title=title,gender = gender,point = point,history = history)
         self.session.add(obj)
-        self.session.add(obj)
-        await self.session.commit()
-        await self.session.refresh(obj)
         return obj
     
     async def get_compliment(self,compliment_id:int)->Compliment|None:
@@ -25,8 +22,12 @@ class ComplimentRepository():
     async def get_all_compliments(self)->Sequence[Compliment]:
         res = await self.session.execute(select(Compliment))
         return res.scalars().all()
+    # system must get compliments_id in history, then service upgrade it.
+    async def get_user_history(self,user_id:int):
+        # start session
+        stmt = select(History.compliments).filter(History.user_id == user_id) #noqa
+            
     
-    # это будет @put endpoint
     async def update_compliment(self,compliment_id:int,payload:ComplimentSchema)-> Compliment|None:
         obj = await self.get_compliment(compliment_id)
         if not obj:
@@ -34,8 +35,7 @@ class ComplimentRepository():
         for field, value in payload.model_dump(exclude_unset=True).items():
             setattr(obj,field,value)
         self.session.add(obj)
-        await self.session.commit()
-        await self.session.refresh(obj)
+        self.session.refresh(obj)
         return obj 
          
     async def delete_compliment(self,compliment_id:int)->bool:
@@ -43,6 +43,5 @@ class ComplimentRepository():
         if not obj:
             return False
         await self.session.delete(obj)
-        await self.session.commit()
         return True
     
