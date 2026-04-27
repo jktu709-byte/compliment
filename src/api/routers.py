@@ -1,6 +1,6 @@
 # This is something like DTO, naybe transport stuff  
 from fastapi import APIRouter, Depends
-from src.schemas.schemas import ComplimentSchema
+from src.schemas.comp_schemas import ComplimentSchema
 from src.api.crud import ComplimentRepository
 from src.core.database import get_session
 

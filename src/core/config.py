@@ -1,4 +1,4 @@
-# Тут находятся настройки базы данных
+# Тут читаются настройки базы данных
 
 from dotenv import load_dotenv 
 import os

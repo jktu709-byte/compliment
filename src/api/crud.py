@@ -1,8 +1,8 @@
-from typing import Sequence
+from typing import List, Set
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select,func,or_ #noqa
 from src.models.comp_models import Gender,Compliment,Users,History#noqa
-from src.schemas.schemas import ComplimentSchema
+from src.schemas.comp_schemas import ComplimentSchema
 # Мой класс отвечает за огромное количество вещей. Это как-то не по SRP.Разберись с этим
 # Вынести рандом в бизнес логику.
 # Unit of work?
@@ -15,18 +15,21 @@ class ComplimentRepository():
         self.session.add(obj)
         return obj
     
-    async def get_compliment(self,compliment_id:int)->Compliment|None:
-        res = await self.session.execute(select(Compliment).filter(Compliment.id == compliment_id))
+    async def get_compliment(self,complmnt_id:int)->Compliment|None:
+        res = await self.session.execute(select(Compliment).filter(Compliment.id == complmnt_id))
         return res.scalar_one_or_none()
     
-    async def get_all_compliments(self)->Sequence[Compliment]:
+    async def get_all_compliments(self)->List[Compliment]:
         res = await self.session.execute(select(Compliment))
         return res.scalars().all()
     # system must get compliments_id in history, then service upgrade it.
-    async def get_user_history(self,user_id:int):
-        # start session
-        stmt = select(History.compliments).filter(History.user_id == user_id) #noqa
-            
+    
+    async def get_all_history(self,user_id:int)->None|Set[int]:
+        stmt = select(
+            History.compliment_id
+        ).filter(History.user_id == user_id) #noqa
+        res = await self.session.execute(stmt)
+        return res.scalars().all()
     
     async def update_compliment(self,compliment_id:int,payload:ComplimentSchema)-> Compliment|None:
         obj = await self.get_compliment(compliment_id)
@@ -35,6 +38,7 @@ class ComplimentRepository():
         for field, value in payload.model_dump(exclude_unset=True).items():
             setattr(obj,field,value)
         self.session.add(obj)
+        self.session.flush(obj)
         self.session.refresh(obj)
         return obj 
          
