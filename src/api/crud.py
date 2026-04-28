@@ -9,7 +9,7 @@ from src.schemas.comp_schemas import ComplimentSchema
 class ComplimentRepository():
     def __init__(self,session:AsyncSession) -> None:
         self.session = session
-    
+
     async def create_compliment(self, title:str, gender:Gender|None, point:str,history:str) -> Compliment:
         obj = Compliment(title=title,gender = gender,point = point,history = history)
         self.session.add(obj)
@@ -30,7 +30,6 @@ class ComplimentRepository():
         ).filter(History.user_id == user_id) #noqa
         res = await self.session.execute(stmt)
         return res.scalars().all()
-    
     async def update_compliment(self,compliment_id:int,payload:ComplimentSchema)-> Compliment|None:
         obj = await self.get_compliment(compliment_id)
         if not obj:
