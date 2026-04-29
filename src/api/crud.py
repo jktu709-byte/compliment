@@ -1,12 +1,11 @@
+# CRUD functional work with session and data
 from typing import List, Set
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select,func,or_ #noqa
 from src.models.comp_models import Gender,Compliment,Users,History#noqa
 from src.schemas.comp_schemas import ComplimentSchema
-# Мой класс отвечает за огромное количество вещей. Это как-то не по SRP.Разберись с этим
-# Вынести рандом в бизнес логику.
-# Unit of work?
-class ComplimentRepository():
+
+class ComplimentRepository:
     def __init__(self,session:AsyncSession) -> None:
         self.session = session
 
@@ -22,7 +21,6 @@ class ComplimentRepository():
     async def get_all_compliments(self)->List[Compliment]:
         res = await self.session.execute(select(Compliment))
         return res.scalars().all()
-    # system must get compliments_id in history, then service upgrade it.
     
     async def get_all_history(self,user_id:int)->None|Set[int]:
         stmt = select(

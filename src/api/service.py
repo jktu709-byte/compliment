@@ -1,17 +1,15 @@
+ # I use my crud functional for solving business problems.
 import random
 from fastapi import Depends #noqa
-from sqlalchemy import select,func,or_
+from sqlalchemy import select,func,or_ # noqa
 from src.core.database import get_session #noqa
 from src.models.comp_models import Gender,Compliment,History #noqa
 from src.api.crud import ComplimentRepository #noqa
-from src.utils.depends import get_repo
 
-# There is need to be an uncommon stuff like history view and remove something useless. 
-    # I should use my crud functional for this.
-class ComplimentService():
-    def __init__(self,repo) -> None:
+class ComplimentService:
+    def __init__(self,repo:ComplimentRepository) -> None:
         # it's clean work,bcs service don't know about repository, only about object repo
-        self.repo = get_repo
+        self.repo = repo
     
     async def get_compliment_for_user(self,user_id:int):
         # нужен объект класса, иначе сессия не воркает
@@ -40,13 +38,4 @@ class ComplimentService():
     async def change_compliment():
         return ComplimentRepository.update_compliment()
     
-    async def gender_compliment(self,gender:Gender)->Compliment|None:
-        stmt = select(Compliment)
-        
-        if gender:
-            stmt = stmt.filter(or_(Compliment.gender == gender,Compliment.gender.is_(None)))
-        
-        stmt = stmt.order_by(func.random()).limit(1)
-        res = await self.session.execute(stmt)
-        # res = 
-        return res.scalar_one_or_none()
+    
