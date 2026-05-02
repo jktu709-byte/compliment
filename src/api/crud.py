@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select,func,or_ #noqa
 from src.models.comp_models import Gender,Compliment,Users,History#noqa
 from src.schemas.comp_schemas import ComplimentSchema
-
+from sqlalchemy.orm import selectinload
 class ComplimentRepository:
     def __init__(self,session:AsyncSession) -> None:
         self.session = session
@@ -22,12 +22,11 @@ class ComplimentRepository:
         res = await self.session.execute(select(Compliment))
         return res.scalars().all()
     
-    async def get_all_history(self,user_id:int)->None|Set[int]:
-        stmt = select(
-            History.compliment_id
-        ).filter(History.user_id == user_id) #noqa
+    async def get_user_history(self,user_id:int)->None|List[History]:
+        stmt = select(History).options(selectinload(History.compliment)).filter(History.user_id == user_id) #noqa
         res = await self.session.execute(stmt)
         return res.scalars().all()
+    
     async def update_compliment(self,compliment_id:int,payload:ComplimentSchema)-> Compliment|None:
         obj = await self.get_compliment(compliment_id)
         if not obj:

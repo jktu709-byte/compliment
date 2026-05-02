@@ -11,7 +11,7 @@ class ComplimentService:
         # it's clean work,bcs service don't know about repository, only about object repo
         self.repo = repo
     
-    async def get_compliment_for_user(self,user_id:int):
+    async def get_compliment_for_user(self,user_id:int) -> int|None:
         # нужен объект класса, иначе сессия не воркает
         # Check all compliments
         all_compliments = await self.repo.get_all_compliments()

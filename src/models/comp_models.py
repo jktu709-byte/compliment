@@ -23,18 +23,15 @@ class Compliment(Base):
     title:Mapped[nullable_string] 
     point:Mapped[nullable_string] 
     created_at:Mapped[created] 
-    history:Mapped[String]# = relationship("history.id",ondelete="CASCADE")
+    history:Mapped[String] = relationship("History",back_populates="compliment")
     
 class History(Base):
     __tablename__ = "history"
     id:Mapped[intpk]
-    
     compliment_id:Mapped[int] = mapped_column(ForeignKey("compliments.id",ondelete="CASCADE"))
     # прописать relationship
-    compliment:Mapped["Compliment"] #= relationship(back_populates="Compliments.title")
-    
+    compliment:Mapped["Compliment"] = relationship("Compliment",back_populates="history")
     user_id:Mapped[int] = mapped_column(ForeignKey("user.id",ondelete="CASCASDE"))
-    
     created_at:Mapped[created]
 
 # Later I must setup a verification,authentificetion,autorization and etc.
