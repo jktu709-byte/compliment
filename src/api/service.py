@@ -35,6 +35,12 @@ class ComplimentService:
         await self.repo.commit()
         return chosen
     
+    async def get_history(self,user_id:int):
+        list_history = self.repo.get_user_history(user_id=user_id)
+        if not list_history:
+            return None
+        return list_history
+    
     async def change_compliment():
         return ComplimentRepository.update_compliment()
     

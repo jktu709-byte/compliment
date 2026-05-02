@@ -1,5 +1,5 @@
 # CRUD functional work with session and data
-from typing import List, Set
+from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select,func,or_ #noqa
 from src.models.comp_models import Gender,Compliment,Users,History#noqa
@@ -23,7 +23,10 @@ class ComplimentRepository:
         return res.scalars().all()
     
     async def get_user_history(self,user_id:int)->None|List[History]:
-        stmt = select(History).options(selectinload(History.compliment)).filter(History.user_id == user_id) #noqa
+        stmt = select(
+            History
+            ).options(selectinload(History.compliment)
+                      ).filter(History.user_id == user_id) #noqa
         res = await self.session.execute(stmt)
         return res.scalars().all()
     
