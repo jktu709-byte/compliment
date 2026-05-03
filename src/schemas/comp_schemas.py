@@ -17,6 +17,6 @@ class ComplimentHistoryResponse(BaseModel):
 class ComplimentSchema(BaseModel):
     model_config = ConfigDict(from_attributes= True)
     title:str
-    gender:Optional[Gender|None]
-    point:str|None
+    gender:Optional[Gender]
+    point:Optional[str]
     
