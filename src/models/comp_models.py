@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Annotated, List, Optional, TypeAlias #noqa
-from sqlalchemy import DateTime, Integer, String, text,ForeignKey,Enum as SEnum
+from sqlalchemy import DateTime, Integer, String, text,ForeignKey,Enum as SEnum #noqa
 from sqlalchemy.orm import DeclarativeBase,mapped_column,Mapped,relationship #noqa
 from datetime import datetime
 # def pk():
@@ -23,7 +23,7 @@ class Gender(str,Enum):
 class Compliment(Base):
     __tablename__ = "compliments"
     id:Mapped[int] = mapped_column(primary_key=True)
-    gender:Mapped[Gender|None] =mapped_column(Enum(Gender),nullable= True)
+    gender:Mapped[Gender] =mapped_column(nullable= True)
     # title:Mapped[str] = mapped_column(nullable= False)
     # point:Mapped[str|None] = mapped_column(nullable= True)
     created_at:Mapped[datetime] = mapped_column(DateTime,server_default=text("TIMEZONE('utc',now())")) 
