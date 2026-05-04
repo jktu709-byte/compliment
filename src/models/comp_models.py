@@ -1,4 +1,3 @@
-raise RuntimeError("LOADED THIS FILE")
 from enum import Enum
 from typing import Annotated, List, Optional, TypeAlias #noqa
 from sqlalchemy import DateTime, Integer, String, text,ForeignKey,Enum as SEnum
@@ -52,4 +51,4 @@ class User(Base):
     #     created:datetime,
     #     title_string:String,
     #     nullable_string:String,
-    # }
+    # }9
