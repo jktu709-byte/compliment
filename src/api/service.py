@@ -7,6 +7,7 @@ from src.models.comp_models import Gender,Compliment,History #noqa
 from src.api.crud import ComplimentRepository #noqa
 
 class ComplimentService:
+    
     def __init__(self,repo:ComplimentRepository) -> None:
         # it's clean work,bcs service don't know about repository, only about object repo
         self.repo = repo

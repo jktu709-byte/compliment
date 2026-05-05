@@ -3,7 +3,6 @@ from sqlalchemy.ext.asyncio import create_async_engine,AsyncSession,async_sessio
 from src.core.config import DB_URL
 
 
-
 async_engine = create_async_engine(
     echo=True,
     url = DB_URL,
