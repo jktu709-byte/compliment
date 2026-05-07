@@ -23,11 +23,13 @@ class ComplimentRepository:
         res = await self.session.execute(select(Compliment))
         return res.scalars().all()
     
-    async def get_user_history(self,user_id:int)->None|List[History]:
+    async def get_user_history(self,user_id:int)->List[History]:
         stmt = select(
             History
             ).options(selectinload(History.compliment)
-                      ).filter(History.user_id == user_id) #noqa
+                      ).filter(History.user_id == user_id
+                               ).order_by(History.created_at.desc()
+                                          ).limit(25) #noqa
         res = await self.session.execute(stmt)
         return res.scalars().all()
     
