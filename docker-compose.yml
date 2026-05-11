@@ -1,26 +1,26 @@
 # version: '3.9'
 services:
   db:
-    image: postgres:18
+    image: postgres:16
     restart: always
-    container_name: compliment_base
+    # container_name: compliment_base
     # Если база упадет, перезапуск
     healthcheck: 
-      test: ["CMD-SHELL", "pg_isready -U compliment_user"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 3s
       retries: 5
 
     # Сборка 
     env_file:
-      - src/core/DB.env
+      - ./docker.env
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
       
   app:
     build: 
-      context: C:\DEV\nothing\Compliment_app\
+      context: .
       dockerfile: Dockerfile 
     ports:
       - 8000:8000

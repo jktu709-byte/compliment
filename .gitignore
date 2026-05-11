@@ -1,2 +1,5 @@
 docker.env
-DB.env
+__pycache__
+poetry.lock
+pyproject.toml
+whatnext.md

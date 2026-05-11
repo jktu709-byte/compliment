@@ -22,13 +22,13 @@ async def get_user_compliment(user_id:int,service:ComplimentService = Depends(ge
 @router.put("/{compliment_id}")
 async def update_compliment(compliment_id:int,payload:ComplimentSchema,service:ComplimentService = Depends(get_service)):
     res = await service.change_compliment(compliment_id,payload)
-    if not res:
+    if res is None:
         raise HTTPException(status_code=404, detail="This compliment doesn't exist")
     return 
 
 @router.get("/history/{user_id}",response_model=ComplimentHistoryResponse)
 async def get_user_history(user_id:int,service:ComplimentService = Depends(get_service)):
     res = await service.get_history(user_id=user_id)
-    if not res:
+    if res is None:
         raise HTTPException(status_code= 204, detail="History is empty")
     return res
