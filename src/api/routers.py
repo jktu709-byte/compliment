@@ -10,7 +10,7 @@ router = APIRouter(prefix="/compliments",
 
 @router.get("/test")
 async def test():
-    return {"msg":"Everything ok"}
+    return {"msg":"Everything's ok"}
 #  what should response system if db is empty? 204 - no content
 @router.get("/random/{user_id}",response_model=ComplimentResponse)
 async def get_user_compliment(user_id:int,service:ComplimentService = Depends(get_service)):
