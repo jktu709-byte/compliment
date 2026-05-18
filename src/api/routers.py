@@ -1,9 +1,11 @@
 # This is something like DTO, naybe transport stuff
 # Think about addresses 
-from fastapi import APIRouter, Depends, HTTPException #noqa
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import text #noqa
 from src.schemas.comp_schemas import ComplimentSchema,ComplimentResponse,ComplimentHistoryResponse #noqa
 from src.api.service import ComplimentService
 from src.utils.depends import get_service
+# from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/compliments",
                    tags=["Comliments"])
