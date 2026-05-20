@@ -5,13 +5,14 @@ from sqlalchemy import text #noqa
 from src.schemas.comp_schemas import ComplimentSchema,ComplimentResponse,ComplimentHistoryResponse #noqa
 from src.api.service import ComplimentService
 from src.utils.depends import get_service
-# from sqlalchemy.ext.asyncio import AsyncSession
+from src.decorators.test_conn_deco import require_db_conn
 
 router = APIRouter(prefix="/compliments",
                    tags=["Comliments"])
 
 @router.get("/test")
-async def test():
+@require_db_conn
+async def test_db():
     return {"msg":"Everything's ok"}
 #  what should response system if db is empty? 204 - no content
 @router.get("/random/{user_id}",response_model=ComplimentResponse)
