@@ -17,19 +17,19 @@ class Compliment(Base):
     title:Mapped[str] = mapped_column(nullable= False)
     point:Mapped[str|None] = mapped_column(nullable= True)
     created_at:Mapped[datetime] = mapped_column(DateTime,server_default=text("TIMEZONE('utc',now())")) 
-    history:Mapped[list["History"]] = relationship(back_populates="compliment")
+    history:Mapped[list["History"]] = relationship("History",back_populates="compliment")
 class User(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     name:Mapped[str] = mapped_column(nullable=False)
-    user_history:Mapped[List["History"]] = relationship(back_populates="user")
+    user_history:Mapped[List["History"]] = relationship("History",back_populates="user")
 class History(Base):
     __tablename__ = "history"
     id:Mapped[int] = mapped_column(primary_key=True)
     compliment_id:Mapped[int] = mapped_column(ForeignKey("compliments.id",ondelete="CASCADE"))
-    compliment:Mapped["Compliment"] = relationship(back_populates="history")
-    user_id:Mapped[int] = mapped_column(ForeignKey("user.id",ondelete="CASCADE"))
-    user:Mapped["User"] = relationship(back_populates="user_history")
+    compliment:Mapped["Compliment"] = relationship("Compliment",back_populates="history")
+    user_id:Mapped[int] = mapped_column(ForeignKey("users.id",ondelete="CASCADE"))
+    user:Mapped["User"] = relationship("User",back_populates="user_history")
     created_at:Mapped[datetime] = mapped_column(DateTime,server_default=text("TIMEZONE('utc',now())"))
 
 # Later I must setup a verification,authentificetion,autorization and etc.

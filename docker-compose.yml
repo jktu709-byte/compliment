@@ -18,8 +18,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./baskups:/data
-    # ports:
-      # - 5432:5432
+    # порты пробрасываются для внешних подключений, дабы до сервиса можно было достучаться снаружи
+    ports:
+      - 5433:5432
       
   app:
     build: 
