@@ -9,8 +9,17 @@ stages:
 - build
 - test
 - secret-detection
-services:
-  - build
+- deploy
+build:
+  stage: build
+  image: docker:20.10
+  services:
+    - ...
+  script:
+    -...
+    -...
+    -...
+  
 sast:
   stage: test
 include:
