@@ -15,8 +15,7 @@ COPY . /app/
 # Информация на каком порту крутится приложение
 EXPOSE 8000
 # запускаю poetry скрипт на поднятие бд, само приложение
-CMD ["poetry","run",\
- "uvicorn src.main:app --reload --host 0.0.0.0 --port 8000"]
+CMD ["poetry", "run", "uvicorn", "src.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
 
 #Старая версия 
 # CMD [ "poetry","run","uvicorn","src.main:app","--host","0.0.0.0","--port","8888" ]
