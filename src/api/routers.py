@@ -17,7 +17,7 @@ async def test_db():
 
 @router.post()
 def create_compliment():
-    res = [] #noqa
+    
     return "Данные внесены успешно"
 #  what should response system if db is empty? 204 - no content
 @router.get("/random/{user_id}",response_model=ComplimentResponse)
