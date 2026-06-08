@@ -1,9 +1,8 @@
 # CRUD functional work with session and data
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select,func,or_ #noqa
+from sqlalchemy import select #noqa
 from src.models.comp_models import Gender,Compliment,History#noqa
-from src.schemas.comp_schemas import ComplimentSchema
 from sqlalchemy.orm import selectinload
 class ComplimentRepository:
     
@@ -11,10 +10,13 @@ class ComplimentRepository:
         self.session = session
 
     async def create_compliment(self, title:str, gender:Gender|None, point:str) -> Compliment:
-        obj = Compliment(title=title,gender = gender,point = point)
+        obj = Compliment(title=title,gender = gender,point = point,)
         self.session.add(obj)
         return obj
     
+    async def add_list(self, compliments:List[Compliment]):
+        await self.session.add_all(compliments)
+         
     async def get_compliment(self,complmnt_id:int)->Compliment|None:
         res = await self.session.execute(select(Compliment).filter(Compliment.id == complmnt_id))
         return res.scalar_one_or_none()
@@ -32,17 +34,6 @@ class ComplimentRepository:
                                           ).limit(25) #noqa
         res = await self.session.execute(stmt)
         return res.scalars().all()
-    
-    async def update_compliment(self,compliment_id:int,payload:ComplimentSchema)-> Compliment|None:
-        obj = await self.get_compliment(compliment_id)
-        if not obj:
-            return None
-        for field, value in payload.model_dump(exclude_unset=True).items():
-            setattr(obj,field,value)
-        self.session.add(obj)
-        self.session.flush(obj)
-        self.session.refresh(obj)
-        return obj 
          
     async def delete_compliment(self,compliment_id:int)->bool:
         obj = await self.get_compliment(compliment_id)
@@ -51,3 +42,5 @@ class ComplimentRepository:
         await self.session.delete(obj)
         return True
     
+    async def commit(self):
+        await self.session.commit()

@@ -3,27 +3,28 @@ from typing import Annotated, List, Optional, TypeAlias #noqa
 from sqlalchemy import DateTime, Integer, String, text,ForeignKey,Enum as SEnum #noqa
 from sqlalchemy.orm import DeclarativeBase,mapped_column,Mapped,relationship #noqa
 from datetime import datetime
-class Base(DeclarativeBase):
+class BDBase(DeclarativeBase):
     pass
 #Насчет пола просто вьебу выпадающий список так будет проще
 class Gender(str,Enum):
     male = "male"
     female = "female"
     neutral = "neutral"
-class Compliment(Base):
+class Compliment(BDBase):
     __tablename__ = "compliments"
     id:Mapped[int] = mapped_column(primary_key=True)
-    gender:Mapped[Gender] =mapped_column(nullable= True)
+    gender:Mapped[Gender] =mapped_column(nullable= False)
     title:Mapped[str] = mapped_column(nullable= False)
     point:Mapped[str|None] = mapped_column(nullable= True)
+    # category:Mapped[str|None] = mapped_column()
     created_at:Mapped[datetime] = mapped_column(DateTime,server_default=text("TIMEZONE('utc',now())")) 
     history:Mapped[list["History"]] = relationship("History",back_populates="compliment")
-class User(Base):
+class User(BDBase):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     name:Mapped[str] = mapped_column(nullable=False)
     user_history:Mapped[List["History"]] = relationship("History",back_populates="user")
-class History(Base):
+class History(BDBase):
     __tablename__ = "history"
     id:Mapped[int] = mapped_column(primary_key=True)
     compliment_id:Mapped[int] = mapped_column(ForeignKey("compliments.id",ondelete="CASCADE"))
@@ -35,18 +36,3 @@ class History(Base):
 # Later I must setup a verification,authentificetion,autorization and etc.
 
 #В планах добавить табличку Context, где будут обьяснятся примеры и контекст
-# type_annotation_map = {
-    #     intpk: Integer,
-    #     created:datetime,
-    #     title_string:String,
-    #     nullable_string:String,
-    # }
-    # def pk():
-#     return mapped_column(Integer,primary_key=True)
-# def title_str():
-#     return mapped_column(String,nullable=False)
-# def created():
-#     return mapped_column(datetime,server_default=text("TIMEZONE('utc',now())"))
-# intpk: TypeAlias = Annotated[int,mapped_column(Integer,primary_key=True)]
-# created:TypeAlias = Annotated[datetime,mapped_column(server_default=text("TIMEZONE('utc',now())"))]
-# str_512 = Annotated[str,mapped_column(String(512))]
