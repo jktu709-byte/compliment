@@ -10,6 +10,12 @@ class Gender(str,Enum):
     male = "male"
     female = "female"
     neutral = "neutral"
+
+class Role(str,Enum):
+    user = "user"
+    admin = "admin"
+    moderation = "moderation"
+
 class Compliment(BDBase):
     __tablename__ = "compliments"
     id:Mapped[int] = mapped_column(primary_key=True)
@@ -23,6 +29,7 @@ class User(BDBase):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     name:Mapped[str] = mapped_column(nullable=False)
+    role:Mapped[Role] = mapped_column(nullable=False)
     user_history:Mapped[List["History"]] = relationship("History",back_populates="user")
 class History(BDBase):
     __tablename__ = "history"

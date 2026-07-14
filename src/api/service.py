@@ -11,6 +11,9 @@ class ComplimentService:
         # it's clean work,bcs service don't know about repository, only about object repo
         self.repo = repo
     
+    async def get_current_status(self,user_id:int):
+        await self.repo.get_user_role(user_id)
+    # подумать над целесообразностью async в cpu задаче
     async def input_data_from_file(
         self,
         file:UploadFile,

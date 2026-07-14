@@ -2,13 +2,17 @@
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select #noqa
-from src.models.comp_models import Gender,Compliment,History#noqa
+from src.models.comp_models import User,Gender,Compliment,History#noqa
 from sqlalchemy.orm import selectinload
 class ComplimentRepository:
     
     def __init__(self,session:AsyncSession) -> None:
         self.session = session
 
+    async def get_user_role(self,user_id:int):
+        querry = await self.session.execute(select(User.role).where(User.id == user_id))
+        return querry
+    
     async def create_compliment(self, title:str, gender:Gender|None, point:str) -> Compliment:
         obj = Compliment(title=title,gender = gender,point = point,)
         self.session.add(obj)

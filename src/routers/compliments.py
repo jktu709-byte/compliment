@@ -7,15 +7,15 @@ from src.api.service import ComplimentService
 from src.utils.depends import get_service
 from src.decorators.test_conn_deco import require_db_conn
 
-router = APIRouter(prefix="/compliments",
+compl_router = APIRouter(prefix="/compliments",
                    tags=["Comliments"])
 
-@router.get("/test")
+@compl_router.get("/test")
 @require_db_conn
 async def test_db():
     return {"msg":"Everything's ok"}
 
-@router.post("/data/input")
+@compl_router.post("/data/input")
 async def append_data(
     json_file:UploadFile = File(...),
     service:ComplimentService = Depends(get_service)
@@ -30,7 +30,7 @@ async def append_data(
     return res
 
 #  what should response system if db is empty? 204 - no content
-@router.get("/data/random/{user_id}",response_model=ComplimentResponse)
+@compl_router.get("/data/random/{user_id}",response_model=ComplimentResponse)
 async def get_user_compliment(user_id:int,service:ComplimentService = Depends(get_service)):
 
     ans = await service.get_compliment_for_user(user_id)
@@ -38,19 +38,19 @@ async def get_user_compliment(user_id:int,service:ComplimentService = Depends(ge
         raise HTTPException(status_code = 204, detail= "No compliments")
     return ans
 
-@router.get("/data/all",response_model= ComplimentListResponse)
+@compl_router.get("/data/all",response_model= ComplimentListResponse)
 async def compliments_list(service: ComplimentService):
     res = await service.list_compliments()
     return res
 # payload  = put,post   
-@router.put("/data/{compliment_id}")
+@compl_router.put("/data/{compliment_id}")
 async def update_compliment(compliment_id:int,service:ComplimentService = Depends(get_service)):
     res = await service.change_compliment(compliment_id)
     if res is None:
         raise HTTPException(status_code=404, detail="This compliment doesn't exist")
     return 
 
-@router.get("/history/{user_id}",response_model=ComplimentHistoryResponse)
+@compl_router.get("/history/{user_id}",response_model=ComplimentHistoryResponse)
 async def get_user_history(user_id:int,service:ComplimentService = Depends(get_service)):
     res = await service.get_history(user_id=user_id)
     if res is None:
