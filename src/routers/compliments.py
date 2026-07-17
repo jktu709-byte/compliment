@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy import text #noqa
 from src.schemas.comp_schemas import ComplimentListResponse,ComplimentHistoryResponse,ComplimentResponse#noqa
 from src.api.service import ComplimentService
-from src.utils.depends import get_service
+from src.api.repository import 
 from src.decorators.test_conn_deco import require_db_conn
 
 compl_router = APIRouter(prefix="/compliments",

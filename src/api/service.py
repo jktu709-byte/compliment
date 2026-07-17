@@ -3,15 +3,22 @@ import json
 import random
 from fastapi import Depends, UploadFile #noqa
 from src.models.comp_models import Gender,Compliment,History #noqa
-from src.api.crud import ComplimentRepository #noqa
+from src.api.repository import ComplimentRepository #noqa
 from src.schemas.comp_schemas import ComplimentAppendDTO
+class UserService:
+    
+    def __init__(self,repo:ComplimentRepository):
+        self.repo = repo
+    
+    def register(self, name:str, gender:Gender, password: str):
+        ...
 class ComplimentService:
     
     def __init__(self,repo:ComplimentRepository) -> None:
         # it's clean work,bcs service don't know about repository, only about object repo
         self.repo = repo
     
-    async def get_current_status(self,user_id:int):
+    async def check_my_status(self,user_id:int):
         await self.repo.get_user_role(user_id)
     # подумать над целесообразностью async в cpu задаче
     async def input_data_from_file(

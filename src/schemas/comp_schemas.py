@@ -5,6 +5,11 @@ from typing import Optional
 from src.models.comp_models import Gender,Compliment
 
 # Валидация ответа
+class UserCreate(BaseModel):
+    name:str
+    gender:Gender
+    password:str
+
 class ComplimentResponse(BaseModel):
     # as i know from_attributes might read field from objects attributes
     model_config = ConfigDict(from_attributes = True)

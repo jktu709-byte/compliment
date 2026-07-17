@@ -29,6 +29,7 @@ class User(BDBase):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     name:Mapped[str] = mapped_column(nullable=False)
+    gender:Mapped[Gender] = mapped_column(nullable=False)
     role:Mapped[Role] = mapped_column(nullable=False)
     user_history:Mapped[List["History"]] = relationship("History",back_populates="user")
 class History(BDBase):
