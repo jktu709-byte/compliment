@@ -31,6 +31,7 @@ class User(BDBase):
     name:Mapped[str] = mapped_column(nullable=False)
     gender:Mapped[Gender] = mapped_column(nullable=False)
     role:Mapped[Role] = mapped_column(nullable=False)
+    password_hash:Mapped[str] = mapped_column(nullable=False)
     user_history:Mapped[List["History"]] = relationship("History",back_populates="user")
 class History(BDBase):
     __tablename__ = "history"

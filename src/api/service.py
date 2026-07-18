@@ -4,22 +4,13 @@ import random
 from fastapi import Depends, UploadFile #noqa
 from src.models.comp_models import Gender,Compliment,History #noqa
 from src.api.repository import ComplimentRepository #noqa
-from src.schemas.comp_schemas import ComplimentAppendDTO
-class UserService:
-    
-    def __init__(self,repo:ComplimentRepository):
-        self.repo = repo
-    
-    def register(self, name:str, gender:Gender, password: str):
-        ...
+from src.schemas.comp_schemas import ComplimentAppendDTO   
 class ComplimentService:
     
     def __init__(self,repo:ComplimentRepository) -> None:
         # it's clean work,bcs service don't know about repository, only about object repo
         self.repo = repo
     
-    async def check_my_status(self,user_id:int):
-        await self.repo.get_user_role(user_id)
     # подумать над целесообразностью async в cpu задаче
     async def input_data_from_file(
         self,
@@ -94,4 +85,19 @@ class ComplimentService:
         self.session.refresh(obj)
         return obj
     
+class AuthService:
     
+    def __init__(self,repo:ComplimentRepository):
+        self.repo = repo
+    
+    def register(self, name:str, gender:Gender, password: str):
+        ...
+    def login(self,name:str,password:str):
+        ...
+    def logout(self,name:str,token:str):
+        ...
+    
+    
+class UserService:
+    def __init__(self,repo:ComplimentRepository):
+        self.repo = repo
