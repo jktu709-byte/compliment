@@ -16,6 +16,10 @@ class Role(str,Enum):
     admin = "admin"
     moderation = "moderation"
 
+class Status(str, Enum):
+    ACTIVE = "ACTIVE"
+    BANNED = "BANNED"
+
 class Compliment(BDBase):
     __tablename__ = "compliments"
     id:Mapped[int] = mapped_column(primary_key=True)
@@ -29,7 +33,9 @@ class User(BDBase):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     name:Mapped[str] = mapped_column(nullable=False)
+    email:...
     gender:Mapped[Gender] = mapped_column(nullable=False)
+    status:Mapped[Status]
     role:Mapped[Role] = mapped_column(nullable=False)
     password_hash:Mapped[str] = mapped_column(nullable=False)
     user_history:Mapped[List["History"]] = relationship("History",back_populates="user")

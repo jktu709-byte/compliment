@@ -1,4 +1,4 @@
-# CRUD functional work with session and data
+# CRUD functional work with session and databases
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select #noqa
@@ -25,7 +25,7 @@ class UserRepository:
         return user
     
     async def get_all_users(self):
-        users_list = select(User)
+        return await self.session.execute(select(User))
         
     
     async def get_user_history(self,user_id:int)->List[History]:
@@ -70,4 +70,9 @@ class ComplimentRepository:
         await self.session.commit()
         
 class AuthRepository:
-    ...
+    
+    def __init__(self,session:AsyncSession) -> None:
+        self.session = session
+    
+    async def get_user_status(self,):
+        ...

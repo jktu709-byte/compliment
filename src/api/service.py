@@ -3,7 +3,7 @@ import json
 import random
 from fastapi import Depends, UploadFile #noqa
 from src.models.comp_models import Gender,Compliment,History #noqa
-from src.api.repository import ComplimentRepository #noqa
+from src.api.repository import ComplimentRepository,AuthRepository #noqa
 from src.schemas.comp_schemas import ComplimentAppendDTO   
 class ComplimentService:
     
@@ -90,11 +90,13 @@ class AuthService:
     def __init__(self,repo:ComplimentRepository):
         self.repo = repo
     
-    def register(self, name:str, gender:Gender, password: str):
+    async def get_current_status(self, name:str):
         ...
-    def login(self,name:str,password:str):
+    async def register(self, name:str, gender:Gender, password: str):
         ...
-    def logout(self,name:str,token:str):
+    async def login(self,name:str,password:str):
+        ...
+    async def logout(self,name:str,token:str):
         ...
     
     
