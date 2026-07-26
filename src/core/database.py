@@ -1,7 +1,7 @@
 # добавить отображение ошибок
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine,AsyncSession,async_sessionmaker #noqa
-from src.core.config import DB_URL
+from src.core.db_config import DB_URL
 from src.models.comp_models import BDBase,Compliment,User,History #noqa
 
 

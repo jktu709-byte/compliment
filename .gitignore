@@ -1,4 +1,5 @@
-docker.env
+
+.env
 __pycache__
 poetry.lock
 pyproject.toml
@@ -7,3 +8,5 @@ deco.ipynb
 greenlet_check.py
 multiprocessing.py
 .envrc
+.vscode/
+

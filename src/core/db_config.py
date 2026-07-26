@@ -5,7 +5,7 @@ import os
 
     
 base_dir = Path(__file__).resolve().parent.parent.parent
-env_file = base_dir / "docker.env"
+env_file = base_dir / ".env"
     
 if not env_file.exists():
     raise FileNotFoundError(f"Env file not found:{env_file}")
