@@ -1,4 +1,5 @@
 import hashlib
+
 import bcrypt
 
 
@@ -16,4 +17,5 @@ class Security:
     def _password_digest(self,password:str) -> bytes:
         """Ебашим прехэш, дабы обойти проблему 72 байт в bcrypt(SHA256 выдает где-то 32-64 байта)"""
         return hashlib.sha256(password.encode("utf-8")).digest()
-        
+
+security = Security()

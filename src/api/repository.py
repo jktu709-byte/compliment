@@ -1,21 +1,23 @@
-# CRUD functional work with session and databases
-from typing import List, Optional
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select #noqa
-from src.models.comp_models import User,Gender,Compliment,History#noqa
 from sqlalchemy.orm import selectinload
-class UserRepository:
+
+from src.models.comp_models import Compliment, Gender, History, User
+
+
+class Repository:
     def __init__(self,session:AsyncSession) -> None:
-        self.session = session
+            self.session = session
+class UserRepository(Repository):
     
     async def get_user_role(self,user_id:int):
         querry = await self.session.execute(select(User.role).where(User.id == user_id))
         return querry
     
-    async def get_user_by_name(self,name:str)-> Optional[User]:
+    async def get_user_by_name(self,name:str)-> User|None:
         return await self.session.execute(select(User).where(User.name == name))
     
-    async def get_user_by_id(self,user_id:int)-> Optional[User]:
+    async def get_user_by_id(self,user_id:int)-> User|None:
         return await self.session.get(User, user_id)
     
     async def create_user(self,u_name:str,u_gender:Gender,u_password_hash:str):
@@ -28,34 +30,31 @@ class UserRepository:
         return await self.session.execute(select(User))
         
     
-    async def get_user_history(self,user_id:int)->List[History]:
+    async def get_user_history(self,user_id:int)->list[History]:
         stmt = select(
             History
             ).options(selectinload(History.compliment)
                       ).filter(History.user_id == user_id
                                ).order_by(History.created_at.desc()
-                                          ).limit(25) #noqa
+                                          ).limit(25) 
         res = await self.session.execute(stmt)
         return res.scalars().all()
     
-class ComplimentRepository:
-    
-    def __init__(self,session:AsyncSession) -> None:
-        self.session = session
+class ComplimentRepository(Repository):
     
     async def create_compliment(self, title:str, gender:Gender|None, point:str) -> Compliment:
         obj = Compliment(title=title,gender = gender,point = point,)
         self.session.add(obj)
         return obj
     
-    async def add_list(self, compliments:List[Compliment]):
+    async def add_list(self, compliments:list[Compliment]):
         await self.session.add_all(compliments)
          
     async def get_compliment(self,complmnt_id:int)->Compliment|None:
         res = await self.session.execute(select(Compliment).filter(Compliment.id == complmnt_id))
         return res.scalar_one_or_none()
     
-    async def get_all_compliments(self)->List[Compliment]:
+    async def get_all_compliments(self)->list[Compliment]:
         res = await self.session.execute(select(Compliment))
         return res.scalars().all()
          
@@ -69,10 +68,7 @@ class ComplimentRepository:
     async def commit(self):
         await self.session.commit()
         
-class AuthRepository:
-    
-    def __init__(self,session:AsyncSession) -> None:
-        self.session = session
+class AuthRepository(Repository):
     
     async def get_user_status(self,):
         ...

@@ -1,6 +1,8 @@
 #  Используется для декоратора на проверку соединения
 from sqlalchemy import text
+
 from src.core.database import async_engine
+
 
 async def check_db_conn()-> bool:
     try:

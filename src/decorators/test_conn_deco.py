@@ -1,7 +1,11 @@
-from src.tests.health import check_db_conn
-from fastapi import HTTPException
+from collections.abc import Awaitable, Callable
 from functools import wraps
-from typing import Callable,Awaitable,Any
+from typing import Any
+
+from fastapi import HTTPException
+
+from src.tests.health import check_db_conn
+
 
 def require_db_conn(func:Callable[...,Awaitable[Any]]):
     @wraps(func)

@@ -1,8 +1,10 @@
-# Отдельный файл/класс для разного рода фильтраций
 from sqlalchemy import func, or_, select
 
 from src.models.comp_models import Compliment, Gender
-class Filters():
+
+# Отдельный файл/класс для разного рода фильтраций
+
+class Filters:
     # фильтр по гендеру
     async def gender_compliment(self,gender:Gender)->Compliment|None:
         stmt = select(Compliment)

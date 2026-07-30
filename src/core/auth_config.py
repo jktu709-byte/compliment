@@ -1,6 +1,7 @@
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class SecSettings(BaseSettings):
     # Крч это буквально упрощение жизни. Окружением заботится сам Pydantic и все отлично
     model_config = SettingsConfigDict(

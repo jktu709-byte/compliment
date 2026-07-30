@@ -1,5 +1,7 @@
 from fastapi import APIRouter
-from src.api.service import ComplimentService #noqa
+
+from src.api.service import ComplimentService  #noqa
+
 auth_router = APIRouter(prefix="/auth",tags=["Auth"])
 
 @auth_router.get("/me")

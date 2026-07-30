@@ -1,11 +1,14 @@
 # This is something like DTO, naybe transport stuff
 # Think about addresses 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
-from sqlalchemy import text #noqa
-from src.schemas.comp_schemas import ComplimentListResponse,ComplimentHistoryResponse,ComplimentResponse#noqa
+
 from src.api.service import ComplimentService
-from src.api.repository import AuthRepository #niqa
 from src.decorators.test_conn_deco import require_db_conn
+from src.schemas.comp_schemas import (
+    ComplimentHistoryResponse,
+    ComplimentListResponse,
+    ComplimentResponse,
+)
 
 compl_router = APIRouter(prefix="/compliments",
                    tags=["Comliments"])
@@ -17,12 +20,12 @@ async def test_db():
 
 @compl_router.post("/data/input")
 async def append_data(
+    service:ComplimentService,
     json_file:UploadFile = File(...),
-    service:ComplimentService = Depends(get_service)
     ):
     try:    
         res = await service.input_data_from_file(json_file)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         if e:
             print(f"Ошибка получена {e.__class__}")
         if not e:

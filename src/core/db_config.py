@@ -1,9 +1,9 @@
 # Тут читаются настройки базы данных
-from pathlib import Path
-from dotenv import load_dotenv 
 import os
+from pathlib import Path
 
-    
+from dotenv import load_dotenv
+
 base_dir = Path(__file__).resolve().parent.parent.parent
 env_file = base_dir / ".env"
     

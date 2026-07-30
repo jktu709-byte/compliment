@@ -1,5 +1,6 @@
-from functools import lru_cache
 import time
+from functools import lru_cache
+
 
 @lru_cache
 def func_meme():

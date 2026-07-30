@@ -1,16 +1,18 @@
  # I use my crud functional for solving business problems.
-import json
+import json #noqa
 import random
-from fastapi import Depends, UploadFile #noqa
-from src.models.comp_models import Gender,Compliment,History #noqa
-from src.api.repository import ComplimentRepository,AuthRepository #noqa
-from src.schemas.comp_schemas import ComplimentAppendDTO   
-class ComplimentService:
-    
+from fastapi import UploadFile 
+from src.models.comp_models import Gender,Compliment,History 
+from src.api.repository import ComplimentRepository,UserRepository #noqa 
+from src.schemas.comp_schemas import ComplimentAppendDTO
+from src.core.exceptions import UserAlreadyExistsError
+from src.auth.security import security
+
+
+class Service:
     def __init__(self,repo:ComplimentRepository) -> None:
-        # it's clean work,bcs service don't know about repository, only about object repo
-        self.repo = repo
-    
+            self.repo = repo
+class ComplimentService(Service):
     # подумать над целесообразностью async в cpu задаче
     async def input_data_from_file(
         self,
@@ -27,7 +29,7 @@ class ComplimentService:
         print(type(valid_data))
         
         if not valid_data:
-            return None  
+            return "No data"  
         # Если данные есть пробуем занести их в базу
         entities = [Compliment(title = i.title,point = i.point,gender = i.gender) for i in valid_data]
         print(entities[0])
@@ -85,10 +87,7 @@ class ComplimentService:
         self.session.refresh(obj)
         return obj
     
-class AuthService:
-    
-    def __init__(self,repo:ComplimentRepository):
-        self.repo = repo
+class AuthService(Service):
     
     async def get_current_status(self, name:str):
         ...
@@ -100,6 +99,12 @@ class AuthService:
         ...
     
     
-class UserService:
-    def __init__(self,repo:ComplimentRepository):
-        self.repo = repo
+class UserService(Service):
+    
+    async def register(self,name:str,gender:Gender,password:str):
+        existing = self.repo.get_user_by_name(name)
+        if existing:
+            raise UserAlreadyExistsError
+        user = await self.repo.create_user(u_name=name,u_gender=gender,u_password_hash=security.hash_password(password))
+        await self.repo.commit()
+        return user

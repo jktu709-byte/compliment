@@ -1,8 +1,11 @@
 # Models for validation
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict
 from typing import Optional
-from src.models.comp_models import Gender,Compliment
+
+from pydantic import BaseModel, ConfigDict
+
+from src.models.comp_models import Compliment, Gender
+
 
 # Валидация ответа
 class UserCreate(BaseModel):

@@ -1,8 +1,11 @@
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.routers.compliments import compl_router
+
 from src.core.database import init_db
+from src.routers.compliments import compl_router
+
 #import uvicorn
 
 @asynccontextmanager

@@ -1,12 +1,12 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends
-from src.api.crud import ComplimentRepository
-from src.api.service import ComplimentService
+from fastapi import Depends #noqa
+from src.api.repository import Repository
 from src.core.database import get_session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-def get_repo(session:AsyncSession = Depends(get_session))->ComplimentRepository:
-        return ComplimentRepository(session)
+
+def get_repo(session:AsyncSession = Depends(get_session))->Repository:
+        return Repository(session)
                                     
-def get_service(repo:ComplimentRepository = Depends(get_repo))->ComplimentService:
-        return ComplimentService(repo)
+def get_service(repo:Repository = Depends(get_repo))->Service:
+        return Service(repo)
 
