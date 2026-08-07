@@ -9,6 +9,7 @@ from src.schemas.comp_schemas import (
     ComplimentListResponse,
     ComplimentResponse,
 )
+from src.utils.depends import get_service
 
 compl_router = APIRouter(prefix="/compliments",
                    tags=["Comliments"])
@@ -51,7 +52,7 @@ async def update_compliment(compliment_id:int,service:ComplimentService = Depend
     res = await service.change_compliment(compliment_id)
     if res is None:
         raise HTTPException(status_code=404, detail="This compliment doesn't exist")
-    return 
+    return res
 
 @compl_router.get("/history/{user_id}",response_model=ComplimentHistoryResponse)
 async def get_user_history(user_id:int,service:ComplimentService = Depends(get_service)):

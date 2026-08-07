@@ -1,4 +1,4 @@
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, or_, select  # noqa: EXE002
 
 from src.models.comp_models import Compliment, Gender
 

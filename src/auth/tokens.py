@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 import jwt
 
 
+# Отвественен за простые операции типо создания/удаления/хэширования паролей, токенов и подобной мути, помогатор проще говоря
 class TokenHelper:
     
     def generate_sesion_token(self) -> tuple[str,str]:

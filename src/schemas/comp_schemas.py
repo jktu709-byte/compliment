@@ -1,6 +1,5 @@
 # Models for validation
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -17,7 +16,7 @@ class ComplimentResponse(BaseModel):
     # as i know from_attributes might read field from objects attributes
     model_config = ConfigDict(from_attributes = True)
     title:str
-    point:Optional[str]
+    point:str|None
 
 class ComplimentListResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -25,11 +24,11 @@ class ComplimentListResponse(BaseModel):
 # валидация ответа истории
 class ComplimentHistoryResponse(BaseModel):
     model_config = ConfigDict(from_attributes= True)
-    compliment:Optional[ComplimentResponse]
+    compliment:ComplimentResponse|None
     created_at:datetime
 # Проверка бд 
 class ComplimentAppendDTO(BaseModel):
     model_config = ConfigDict(from_attributes= True)
     title:str
     gender:Gender
-    point:Optional[str]
+    point:str|None
