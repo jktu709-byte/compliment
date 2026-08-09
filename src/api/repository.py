@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.models.comp_models import Compliment, Gender, History, User
+from src.models.comp_models import Compliment, Gender, History, RefreshToken, User
 
 
 class Repository:
@@ -69,6 +71,14 @@ class ComplimentRepository(Repository):
         await self.session.commit()
         
 class AuthRepository(Repository):
+    # добавлять токены в бд не надо, просто отправляй их клиенту, потом надо будет разбираться где их хранить - в локалке или же в куках
+    async def create_reafresh_token(self, user_id:int, token_hash: str, expires:datetime):
+        refresh_token = RefreshToken(user_id = user_id,token_hash = token_hash,expires_at = expires)
+        self.session.add(refresh_token)
+        self.session.flush()
     
-    async def get_user_status(self,):
-        ...
+    async def get_refresh_token(self,token_hash):
+        return await self.session.scalar(select(RefreshToken).where(RefreshToken.token_hash == token_hash))
+    
+    async def delete_refresh_token(self,token_obj:RefreshToken):
+        return self.session.delete(token_obj)
