@@ -7,6 +7,7 @@ from src.schemas.auth import LoginRequest, RefreshRequest, TokenPair
 from src.utils.depends import get_service
 
 auth_router = APIRouter(prefix="/auth",tags=["Auth"])
+
 def _set_cookies_settings(response:Response,acces_token:str,refresh_token:str):
     response.set_cookie(
         key= auth_settings.access_cookie_name,

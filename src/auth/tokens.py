@@ -39,3 +39,4 @@ class TokenHelper:
             "iss":"Auth"
         }
         return jwt.encode(payload)
+token_helper = TokenHelper

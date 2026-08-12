@@ -1,18 +1,27 @@
  # I use my crud functional for solving business problems.
-import json #noqa
+import json
 import random
-from fastapi import UploadFile 
-from src.models.comp_models import Gender,Compliment,History 
-from src.api.repository import ComplimentRepository,UserRepository #noqa 
-from src.schemas.comp_schemas import ComplimentAppendDTO
-from src.core.exceptions import UserAlreadyExistsError
+from datetime import datetime, timedelta, timezone
+
+from fastapi import UploadFile
+
+from src.api.repository import AuthRepository, ComplimentRepository, UserRepository
 from src.auth.security import security
+from src.auth.tokens import token_helper
+from src.core.auth_config import auth_settings
+from src.core.exceptions import (
+    InvalidCredentialsError,
+    UserAlreadyExistsError,
+    UserNotFoundError,
+)
+from src.models.comp_models import Compliment, Gender, History
+from src.schemas.auth import TokenPair
+from src.schemas.comp_schemas import ComplimentAppendDTO
 
 
-class Service:
-    def __init__(self,repo:ComplimentRepository) -> None:
-            self.repo = repo
-class ComplimentService(Service):
+class ComplimentService:
+    def __init__(self,repo:ComplimentRepository):
+        self.repo = repo
     # подумать над целесообразностью async в cpu задаче
     async def input_data_from_file(
         self,
@@ -87,20 +96,51 @@ class ComplimentService(Service):
         self.session.refresh(obj)
         return obj
     
-class AuthService(Service):
+class AuthService:
     
-    async def get_current_status(self, name:str):
-        ...
-    async def register(self, name:str, gender:Gender, password: str):
-        ...
-    async def login(self,name:str,password:str):
-        ...
-    async def logout(self,name:str,token:str):
-        ...
+    def __init__(
+        self,
+        auth_repo:AuthRepository,
+        user_repo:UserRepository
+        ):
+        self.auth_repo = auth_repo
+        self.user_repo = user_repo
+        
+    async def login(self,name:str,password:str) -> TokenPair:
+        user = self._get_user_or_raise(name=name,password=password)
+        token_pair = self._issue_tokens(user.id)
+        return token_pair.acces_token,token_pair.refresh_token
     
+    async def refresh_token(self):
+        ...
+        
+    async def _get_user_for_token(self,user_id:int):
+        user = await self.user_repo.get_user_by_id(user_id=user_id)
+        if not user:
+            raise UserNotFoundError
+        return user
     
-class UserService(Service):
+    async def _get_user_or_raise(self,name:str,password:str):
+        user = await self.user_repo.get_user_by_name(name)
+        if not user or not security.verify_password(password=password,password_hash=user.password_hash):
+            raise InvalidCredentialsError 
+        return user
     
+    def _refresh_expiry(self) -> datetime:
+        return datetime.now(timezone.utc) + timedelta(minutes=auth_settings.refresh_token_expires_minutes)
+    # здесь собирается токен для последующего использования в логине
+    async def _issue_tokens(self, user_id: int) -> TokenPair:
+        refresh_token = token_helper.create_refresh_token()
+        refresh_hash = token_helper.hash_session_token(refresh_token)
+        access_token = token_helper.create_access_token(user_id)
+        expires_at = self._refresh_expiry()
+        await self.db.auth.create_refresh_token(user_id=user_id, token_hash=refresh_hash, expires_at=expires_at)
+        await self.db.session.commit()
+        return TokenPair(access_token=access_token, refresh_token=refresh_token)
+class UserService:
+    def __init__(self,repo:UserRepository):
+        self.repo = repo
+        
     async def register(self,name:str,gender:Gender,password:str):
         existing = self.repo.get_user_by_name(name)
         if existing:
