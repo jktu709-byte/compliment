@@ -16,7 +16,9 @@ async def app_lifespan(app:FastAPI):
     yield
 
 app = FastAPI(lifespan= app_lifespan)
-app.add_middleware(CORSMiddleware,allow_origins = "*")
+# с Корс погоди пока что
+# app.add_middleware(CORSMiddleware,allow_origins = "*")
+# объединяем весь функционал в один большой пласт
 app.include_router(router=compl_router)
 app.include_router(router=user_router)
 app.include_router(router=auth_router) 

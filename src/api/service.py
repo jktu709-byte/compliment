@@ -11,6 +11,8 @@ from src.auth.tokens import token_helper
 from src.core.auth_config import auth_settings
 from src.core.exceptions import (
     InvalidCredentialsError,
+    RefreshTokenExpiredError,
+    RefreshTokenNotFoundError,
     UserAlreadyExistsError,
     UserNotFoundError,
 )
@@ -111,8 +113,24 @@ class AuthService:
         token_pair = self._issue_tokens(user.id)
         return token_pair.acces_token,token_pair.refresh_token
     
-    async def refresh_token(self):
-        ...
+    async def refresh_token(self,raw_token:str):
+        stored = self._get_valid_refresh(raw_token=raw_token)
+        user = self._get_user_for_token(stored.user_id)
+        await self.auth_repo.delete_refresh_token(stored)
+        pair = self._issue_tokens(user.id)
+        return pair
+    
+    async def _get_valid_refresh(self,raw_token:str):
+        token_hash = token_helper.hash_session_token(raw_token)
+        stored = await self.auth_repo.get_refresh_token(token_hash=token_hash)
+        if not stored or stored.revoked:
+            raise RefreshTokenNotFoundError
+        # прописываем удаление токена
+        now = datetime.now(timezone.utc)
+        if stored.expires_at <= now:
+             await self.auth_repo.delete_refresh_token(stored) #можно удалить пакетами через cron
+             raise RefreshTokenExpiredError
+        return stored
         
     async def _get_user_for_token(self,user_id:int):
         user = await self.user_repo.get_user_by_id(user_id=user_id)

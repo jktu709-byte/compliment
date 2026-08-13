@@ -2,7 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from src.api.service import AuthService
 from src.core.auth_config import auth_settings
-from src.core.exceptions import AppError, InvalidCredentialsError
+from src.core.exceptions import (
+    AppError,
+    InvalidCredentialsError,
+    RefreshTokenExpiredError,
+    RefreshTokenNotFoundError,
+    UserNotFoundError,
+)
 from src.schemas.auth import LoginRequest, RefreshRequest, TokenPair
 from src.utils.depends import get_service
 
@@ -46,6 +52,19 @@ async def login(data:LoginRequest,response:Response,service:AuthService = Depend
         
 @auth_router.get("/tokens/refresh")
 async def refresh_token(data:RefreshRequest,response:Response,service:AuthService = Depends(get_service)) -> TokenPair:
-    pair = acces,refresh 
     try:
-        await service.
+        pair = await service.refresh_token(data.refresh_token)
+    except RefreshTokenExpiredError as err:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED,detail=str(err)) from err
+    except RefreshTokenNotFoundError as err:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED,detail= str(err)) from err
+    except UserNotFoundError as err:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED,detail= str(err)) from err
+    except AppError as err: 
+        raise HTTPException(status.HTTP_400_BAD_REQUEST,detail= str(err)) from err
+    # настраиваем куки перед отправкой данных
+    _set_cookies_settings(acces_token=pair.acces,refresh_token=pair.refresh)
+    return pair
+
+@auth_router.get("/me")
+async def get_me(user:User = Depends())
