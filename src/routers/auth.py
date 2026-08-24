@@ -10,7 +10,7 @@ from src.core.exceptions import (
     UserNotFoundError,
 )
 from src.schemas.auth import LoginRequest, RefreshRequest, TokenPair
-from src.utils.depends import get_service
+from src.utils.depends import get_service, get_user_from_bearer
 
 auth_router = APIRouter(prefix="/auth",tags=["Auth"])
 
@@ -66,5 +66,7 @@ async def refresh_token(data:RefreshRequest,response:Response,service:AuthServic
     _set_cookies_settings(acces_token=pair.acces,refresh_token=pair.refresh)
     return pair
 
-@auth_router.get("/me")
-async def get_me(user:User = Depends())
+# @auth_router.get("/me")
+# async def get_me():
+#     res = get_user_from_bearer()
+#     return res

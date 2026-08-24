@@ -17,6 +17,7 @@ gevent = "^26.5.0"
 python-multipart = "^0.0.31"
 pydantic-settings = "^2.14.2"
 bcrypt = "^5.0.0"
+jwt = "^1.4.0"
 
 
 [tool.poetry.group.dev.dependencies]
