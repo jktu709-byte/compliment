@@ -36,7 +36,7 @@ class User(BDBase):
     id: Mapped[int] = mapped_column(primary_key=True)
     name:Mapped[str] = mapped_column(nullable=False,unique=True,index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    email:...
+    email:Mapped[str] = mapped_column(String,unique=True,index= True)
     gender:Mapped[Gender] = mapped_column(nullable=False,index=True)
     status:Mapped[Status]= mapped_column(nullable=True)
     role:Mapped[Role] = mapped_column(nullable=False)
@@ -54,6 +54,7 @@ class History(BDBase):
 
 # Later I must setup a verification,authentificetion,autorization and etc.
 class RefreshToken(BDBase):
+    __tablename__ = "refresh_token"
     id:Mapped[int] = mapped_column(primary_key=True)
     user_id:Mapped[int] = mapped_column(ForeignKey("users.id"),index=True)
     token_hash:Mapped[str] = mapped_column(String(128),unique=True)

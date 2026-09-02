@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from src.api.service import AuthService
 from src.core.auth_config import auth_settings
-from src.core.exceptions import (
+from src.exceptions.semantic_exceptions import (
     AppError,
     InvalidCredentialsError,
     RefreshTokenExpiredError,
@@ -10,7 +10,7 @@ from src.core.exceptions import (
     UserNotFoundError,
 )
 from src.schemas.auth import LoginRequest, RefreshRequest, TokenPair
-from src.utils.depends import get_service, get_user_from_bearer
+from src.utils.depends import get_service
 
 auth_router = APIRouter(prefix="/auth",tags=["Auth"])
 

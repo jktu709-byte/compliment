@@ -2,7 +2,7 @@ from fastapi import APIRouter,Depends, HTTPException,status #noqa
 from src.api.service import UserService
 from src.schemas.comp_schemas import UserCreate
 from src.utils.depends import get_service
-from src.core.exceptions import UserAlreadyExistsError,AppError
+from src.exceptions.semantic_exceptions import UserAlreadyExistsError,AppError
 user_router = APIRouter("/Users",tags=['Пользователи'])
 
 @user_router.post("/register",status_code=201,summary="Регистрация пользователя")

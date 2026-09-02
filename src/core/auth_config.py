@@ -2,7 +2,7 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings(BaseSettings):
+class AuthSettings(BaseSettings):
     # Крч это буквально упрощение жизни. Окружением заботится сам Pydantic и все отлично
     model_config = SettingsConfigDict(
         env_file=".env", 
@@ -16,14 +16,13 @@ class Settings(BaseSettings):
     jwt_secret_algo: str = "HS256"
     access_token_expires_minutes: int = 15
     refresh_token_expires_minutes: int = 60 * 24 * 30
-    session_ttl_minutes: int = 60 * 24
-    session_extend_minutes: int = 60 * 24 * 7
-    session_rolling_interval_minutes: int = 10
-    session_absolute_timeout_days: int = 30
-    session_cookie_name: str = "session_id"
-    session_cookie_secure: bool = False
-    session_cookie_domain: str | None = None
     access_cookie_name: str = "access_token"
     refresh_cookie_name: str = "refresh_token"
-    
-auth_settings = Settings()
+    # session_ttl_minutes: int = 60 * 24
+    # session_extend_minutes: int = 60 * 24 * 7
+    # session_rolling_interval_minutes: int = 10
+    # session_absolute_timeout_days: int = 30
+    # session_cookie_name: str = "session_id"
+    # session_cookie_secure: bool = False
+    # session_cookie_domain: str | None = None
+auth_settings = AuthSettings()

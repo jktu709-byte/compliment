@@ -1,7 +1,7 @@
 .git
 __pycache__
 .pytest_cache
-.env
+
 deco.ipynb
 whatnext.md
 greenlet_check.py

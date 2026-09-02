@@ -9,7 +9,9 @@ from src.api.repository import AuthRepository, ComplimentRepository, UserReposit
 from src.auth.security import security
 from src.auth.tokens import token_helper
 from src.core.auth_config import auth_settings
-from src.core.exceptions import (
+from src.exceptions.semantic_exceptions import (
+    ComplimentAlreadyExistsError,
+    ComplimentNotFoundError,
     InvalidCredentialsError,
     RefreshTokenExpiredError,
     RefreshTokenNotFoundError,
@@ -43,6 +45,9 @@ class ComplimentService:
             return "No data"  
         # Если данные есть пробуем занести их в базу
         entities = [Compliment(title = i.title,point = i.point,gender = i.gender) for i in valid_data]
+        
+        НАПИШИ ПРОВЕРКУ ВХОДЯЩИХ ДАННЫХ!!!!
+        
         print(entities[0])
         # Добавляем/сохраняем
         await self.repo.add_list(compliments=entities)
@@ -55,7 +60,7 @@ class ComplimentService:
         all_compliments = await self.repo.get_all_compliments()
         # if list empty return None
         if not all_compliments:
-            return None 
+            raise ComplimentNotFoundError()
         # check history
         set_history_ids = await self.repo.get_all_history(user_id= user_id)
         # check available
@@ -75,19 +80,21 @@ class ComplimentService:
     
     async def list_compliments(self) -> list[Compliment]:
         res = await self.repo.get_all_compliments()
+        if not res:
+            raise ComplimentNotFoundError("Список комплиментов не был найден")
         return res
     
     async def get_history(self,user_id:int):
         list_history = self.repo.get_user_history(user_id=user_id)
         if not list_history:
-            return None
+            raise ComplimentNotFoundError()
         return list_history
     
     async def change_compliment(self,comp_id:int):
         # достаю данные
         obj = await self.repo.get_compliment(complmnt_id=comp_id)
         if not obj:
-            return None
+            raise ComplimentNotFoundError()
         # инициализируем поле и значение в модели 
         for field, value in ComplimentAppendDTO.model_dump(exclude_unset=True).items():
             # Задаем новые значени 
@@ -137,11 +144,11 @@ class AuthService:
         if not user:
             raise UserNotFoundError
         return user
-    
+    ИМЯ НЕ УНИКАЛЬНЫЙ КЛЮЧ. А ЧТО БУДЕТ ЕСЛИ ЕСТЬ ДУПЛИКАТ? НЕ ДАВАТЬ ДВУМ РАЗНЫМ ЛЮДЯМ ДОСТУП ИЗ-ЗА ОДНОГО ИМЕНИ? НЕДАЛЬНОВИДНО
     async def _get_user_or_raise(self,name:str,password:str):
         user = await self.user_repo.get_user_by_name(name)
         if not user or not security.verify_password(password=password,password_hash=user.password_hash):
-            raise InvalidCredentialsError 
+            raise InvalidCredentialsError("Неверный логин или пароль") 
         return user
     
     def _refresh_expiry(self) -> datetime:
