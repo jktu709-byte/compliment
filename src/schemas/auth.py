@@ -1,7 +1,16 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr
 
+from src.models.comp_models import Gender
+
+
+# Валидация ответа
+class UserCreate(BaseModel):
+    name:str
+    email:EmailStr
+    gender:Gender
+    password:str
 
 class UserResponse(BaseModel):
     ...

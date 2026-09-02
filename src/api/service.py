@@ -115,8 +115,8 @@ class AuthService:
         self.auth_repo = auth_repo
         self.user_repo = user_repo
         
-    async def login(self,name:str,password:str) -> TokenPair:
-        user = self._get_user_or_raise(name=name,password=password)
+    async def login(self,email:str,password:str) -> TokenPair:
+        user = self._get_user_or_raise(email=email,password=password)
         token_pair = self._issue_tokens(user.id)
         return token_pair.acces_token,token_pair.refresh_token
     
@@ -144,9 +144,9 @@ class AuthService:
         if not user:
             raise UserNotFoundError
         return user
-    ИМЯ НЕ УНИКАЛЬНЫЙ КЛЮЧ. А ЧТО БУДЕТ ЕСЛИ ЕСТЬ ДУПЛИКАТ? НЕ ДАВАТЬ ДВУМ РАЗНЫМ ЛЮДЯМ ДОСТУП ИЗ-ЗА ОДНОГО ИМЕНИ? НЕДАЛЬНОВИДНО
-    async def _get_user_or_raise(self,name:str,password:str):
-        user = await self.user_repo.get_user_by_name(name)
+    # ИМЯ НЕ УНИКАЛЬНЫЙ КЛЮЧ. А ЧТО БУДЕТ ЕСЛИ ЕСТЬ ДУПЛИКАТ? НЕ ДАВАТЬ ДВУМ РАЗНЫМ ЛЮДЯМ ДОСТУП ИЗ-ЗА ОДНОГО ИМЕНИ? НЕДАЛЬНОВИДНО
+    async def _get_user_or_raise(self,email:str,password:str):
+        user = await self.user_repo.get_user_by_email(email=email)
         if not user or not security.verify_password(password=password,password_hash=user.password_hash):
             raise InvalidCredentialsError("Неверный логин или пароль") 
         return user
@@ -166,10 +166,10 @@ class UserService:
     def __init__(self,repo:UserRepository):
         self.repo = repo
         
-    async def register(self,name:str,gender:Gender,password:str):
-        existing = self.repo.get_user_by_name(name)
+    async def register(self,name:str,email:str,gender:Gender,password:str):
+        existing = self.repo.get_user_by_name(email)
         if existing:
-            raise UserAlreadyExistsError
-        user = await self.repo.create_user(u_name=name,u_gender=gender,u_password_hash=security.hash_password(password))
+            raise UserAlreadyExistsError("Пользователь с таким email уже существует")
+        user = await self.repo.create_user(u_name=name,u_gender=gender,u_email = email,u_password_hash=security.hash_password(password))
         await self.repo.commit()
         return user

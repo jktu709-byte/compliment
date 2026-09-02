@@ -34,13 +34,13 @@ class Compliment(BDBase):
 class User(BDBase):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
-    name:Mapped[str] = mapped_column(nullable=False,unique=True,index=True)
+    name:Mapped[str] = mapped_column(nullable=False,index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     email:Mapped[str] = mapped_column(String,unique=True,index= True)
     gender:Mapped[Gender] = mapped_column(nullable=False,index=True)
-    status:Mapped[Status]= mapped_column(nullable=True)
+    # status:Mapped[Status]= mapped_column(nullable=True)
     role:Mapped[Role] = mapped_column(nullable=False)
-    password_hash:Mapped[str] = mapped_column(String(255),unique=True,nullable=False,)
+    password_hash:Mapped[str] = mapped_column(String(255),nullable=False,)
     user_history:Mapped[list["History"]] = relationship("History",back_populates="user")
     refresh_tokens:Mapped[list["RefreshToken"]] = relationship("RefreshToken",back_populates="user",cascade="all, delete-orphan")
 class History(BDBase):
