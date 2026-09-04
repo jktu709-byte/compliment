@@ -4,6 +4,9 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
 from src.api.service import ComplimentService
 from src.decorators.test_conn_deco import require_db_conn
+from src.exceptions.semantic_exceptions import (
+    ComplimentNotFoundError
+)
 from src.schemas.comp_schemas import (
     ComplimentHistoryResponse,
     ComplimentListResponse,
@@ -38,8 +41,8 @@ async def append_data(
 async def get_user_compliment(user_id:int,service:ComplimentService = Depends(get_service)):
 
     ans = await service.get_compliment_for_user(user_id)
-    if ans is None:
-        raise HTTPException(status_code = 204, detail= "No compliments")
+    if ans is ComplimentNotFoundError():
+        raise HTTPException(status_code = 204, detail= ComplimentNotFoundError.msg)
     return ans
 
 @compl_router.get("/data/all",response_model= ComplimentListResponse)
@@ -57,6 +60,6 @@ async def update_compliment(compliment_id:int,service:ComplimentService = Depend
 @compl_router.get("/history/{user_id}",response_model=ComplimentHistoryResponse)
 async def get_user_history(user_id:int,service:ComplimentService = Depends(get_service)):
     res = await service.get_history(user_id=user_id)
-    if res is None:
-        raise HTTPException(status_code= 204, detail="History is empty")
+    if res is ComplimentNotFoundError():
+        raise HTTPException(status_code= 204, detail=ComplimentNotFoundError.msg)
     return res

@@ -42,10 +42,10 @@ async def login(data:LoginRequest,response:Response,service:AuthService = Depend
         # вводим данные 
         acces,refresh = await service.login(data.name,data.password)
     # при неверном вводе пароля или логина выкидываем ошибку
-    except InvalidCredentialsError as e:
+    except InvalidCredentialsError() as e:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED,detail=str(e)) from e
     # ловим любую другую ошибку(надо будет сделать более детальные ошибки)
-    except AppError as e:
+    except AppError() as e:
         raise HTTPException(status.HTTP_400_BAD_REQUEST,detail= str(e)) from e
     _set_cookies_settings(response,acces,refresh)
     return TokenPair(access_token=acces,refresh_token=refresh)

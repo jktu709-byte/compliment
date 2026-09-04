@@ -46,8 +46,6 @@ class ComplimentService:
         # Если данные есть пробуем занести их в базу
         entities = [Compliment(title = i.title,point = i.point,gender = i.gender) for i in valid_data]
         
-        НАПИШИ ПРОВЕРКУ ВХОДЯЩИХ ДАННЫХ!!!!
-        
         print(entities[0])
         # Добавляем/сохраняем
         await self.repo.add_list(compliments=entities)
@@ -131,12 +129,12 @@ class AuthService:
         token_hash = token_helper.hash_session_token(raw_token)
         stored = await self.auth_repo.get_refresh_token(token_hash=token_hash)
         if not stored or stored.revoked:
-            raise RefreshTokenNotFoundError
+            raise RefreshTokenNotFoundError()
         # прописываем удаление токена
         now = datetime.now(timezone.utc)
         if stored.expires_at <= now:
              await self.auth_repo.delete_refresh_token(stored) #можно удалить пакетами через cron
-             raise RefreshTokenExpiredError
+             raise RefreshTokenExpiredError()
         return stored
         
     async def _get_user_for_token(self,user_id:int):
