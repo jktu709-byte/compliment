@@ -1,10 +1,11 @@
 # итак мне нужно прописать ошибки так, чтобы они стали более информативными. 
 class AppError(Exception):
-    """Базовая ошибка приложения."""
-    code:str
-    msg:str
-    def __init__(self, msg):
-        super().__init__(msg)
+    code: str
+    msg: str
+
+    def __init__(self, msg: str | None = None):
+        message = msg if msg is not None else self.msg
+        super().__init__(message)
           
 class InvalidCredentialsError(AppError):
     """Неверная пара логин/пароль."""

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from src.api.service import AuthService
-from src.core.auth_config import auth_settings
+from src.auth.auth_config import auth_settings
 from src.exceptions.semantic_exceptions import (
     AppError,
     InvalidCredentialsError,
@@ -9,8 +9,8 @@ from src.exceptions.semantic_exceptions import (
     RefreshTokenNotFoundError,
     UserNotFoundError,
 )
-from src.schemas.auth import LoginRequest, RefreshRequest, TokenPair
-from src.utils.depends import get_service
+from src.schemas.auth import LoginRequest, RefreshRequest, TokenPair, TokenPairSchema
+from src.utils.depends import get_service  #noqa
 
 auth_router = APIRouter(prefix="/auth",tags=["Auth"])
 
@@ -42,16 +42,16 @@ async def login(data:LoginRequest,response:Response,service:AuthService = Depend
         # вводим данные 
         acces,refresh = await service.login(data.name,data.password)
     # при неверном вводе пароля или логина выкидываем ошибку
-    except InvalidCredentialsError() as e:
+    except InvalidCredentialsError as e:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED,detail=str(e)) from e
     # ловим любую другую ошибку(надо будет сделать более детальные ошибки)
-    except AppError() as e:
+    except AppError as e:
         raise HTTPException(status.HTTP_400_BAD_REQUEST,detail= str(e)) from e
     _set_cookies_settings(response,acces,refresh)
     return TokenPair(access_token=acces,refresh_token=refresh)
         
 @auth_router.get("/tokens/refresh")
-async def refresh_token(data:RefreshRequest,response:Response,service:AuthService = Depends(get_service)) -> TokenPair:
+async def refresh_token(data:RefreshRequest,response:Response,service:AuthService = Depends(get_service)):
     try:
         pair = await service.refresh_token(data.refresh_token)
     except RefreshTokenExpiredError as err:

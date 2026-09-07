@@ -25,7 +25,7 @@ class UserRead(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-class TokenPair(BaseModel):
+class TokenPairSchema(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"

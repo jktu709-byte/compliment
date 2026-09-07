@@ -3,10 +3,12 @@ from src.api.repository import ComplimentRepository,UserRepository,AuthRepositor
 from src.api.service import ComplimentService,UserService,AuthService
 from src.core.database import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.core.auth_config import auth_settings
+from src.auth.auth_config import auth_settings
 import jwt
 from src.auth.tokens import token_helper
 from src.models.comp_models import User
+
+
 def get_compl_repo(session:AsyncSession = Depends(get_session))-> ComplimentRepository:
         return ComplimentRepository(session)
                                     

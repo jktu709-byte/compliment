@@ -25,4 +25,4 @@ class AuthSettings(BaseSettings):
     # session_cookie_name: str = "session_id"
     # session_cookie_secure: bool = False
     # session_cookie_domain: str | None = None
-auth_settings = AuthSettings()
+auth_settings = AuthSettings
