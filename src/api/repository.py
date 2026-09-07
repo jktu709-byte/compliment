@@ -85,7 +85,7 @@ class ComplimentRepository(Repository):
         
 class AuthRepository(Repository):
     # добавлять токены в бд не надо, просто отправляй их клиенту, потом надо будет разбираться где их хранить - в локалке или же в куках
-    async def create_reafresh_token(self, user_id:int, token_hash: str, expires:datetime):
+    async def create_refresh_token(self, user_id:int, token_hash: str, expires:datetime):
         refresh_token = RefreshToken(user_id = user_id,token_hash = token_hash,expires_at = expires)
         # крч await сдедует прописывать тогда, когда я обращаюсь к бд и получаю от нее какой либо ответ
         # например метод add() просто закидывает запись в очередь на запоминание и ему ответ, а то есть await не требуется

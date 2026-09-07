@@ -26,3 +26,4 @@ class ComplimentAppendDTO(BaseModel):
     title:str
     gender:Gender
     point:str|None
+

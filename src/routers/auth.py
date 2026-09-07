@@ -9,8 +9,8 @@ from src.exceptions.semantic_exceptions import (
     RefreshTokenNotFoundError,
     UserNotFoundError,
 )
-from src.schemas.auth import LoginRequest, RefreshRequest, TokenPair, TokenPairSchema
-from src.utils.depends import get_service  #noqa
+from src.schemas.auth import LoginRequest, RefreshRequest, TokenPairSchema
+from src.utils.depends import get_service
 
 auth_router = APIRouter(prefix="/auth",tags=["Auth"])
 
@@ -37,7 +37,7 @@ def _set_cookies_settings(response:Response,acces_token:str,refresh_token:str):
         )
     
 @auth_router.get("/login/jwt",summary= "Вход JWT")
-async def login(data:LoginRequest,response:Response,service:AuthService = Depends(get_service)) -> TokenPair:
+async def login(data:LoginRequest,response:Response,service:AuthService = Depends(get_service)) -> TokenPairSchema:
     try:
         # вводим данные 
         acces,refresh = await service.login(data.name,data.password)
@@ -48,7 +48,7 @@ async def login(data:LoginRequest,response:Response,service:AuthService = Depend
     except AppError as e:
         raise HTTPException(status.HTTP_400_BAD_REQUEST,detail= str(e)) from e
     _set_cookies_settings(response,acces,refresh)
-    return TokenPair(access_token=acces,refresh_token=refresh)
+    return TokenPairSchema(access_token=acces,refresh_token=refresh)
         
 @auth_router.get("/tokens/refresh")
 async def refresh_token(data:RefreshRequest,response:Response,service:AuthService = Depends(get_service)):
@@ -63,7 +63,7 @@ async def refresh_token(data:RefreshRequest,response:Response,service:AuthServic
     except AppError as err: 
         raise HTTPException(status.HTTP_400_BAD_REQUEST,detail= str(err)) from err
     # настраиваем куки перед отправкой данных
-    _set_cookies_settings(acces_token=pair.acces,refresh_token=pair.refresh)
+    _set_cookies_settings(response = ...,acces_token=pair.acces,refresh_token=pair.refresh)
     return pair
 
 # @auth_router.get("/me")

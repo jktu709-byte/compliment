@@ -19,7 +19,7 @@ from src.exceptions.semantic_exceptions import (
     UserNotFoundError,
 )
 from src.models.comp_models import Compliment, Gender, History, User
-from src.schemas.auth import TokenPair
+from src.schemas.auth import TokenPairSchema
 from src.schemas.comp_schemas import ComplimentAppendDTO
 
 
@@ -152,20 +152,18 @@ class AuthService:
         if not user:
             raise UserNotFoundError
         return user
-    # ИМЯ НЕ УНИКАЛЬНЫЙ КЛЮЧ. А ЧТО БУДЕТ ЕСЛИ ЕСТЬ ДУПЛИКАТ? НЕ ДАВАТЬ ДВУМ РАЗНЫМ ЛЮДЯМ ДОСТУП ИЗ-ЗА ОДНОГО ИМЕНИ? НЕДАЛЬНОВИДНО
-    
-    
+
     def _refresh_expiry(self) -> datetime:
         return datetime.now(timezone.utc) + timedelta(minutes=auth_settings.refresh_token_expires_minutes)
     # здесь собирается токен для последующего использования в логине
-    async def _issue_tokens(self, user_id: int) -> TokenPair:
+    async def _issue_tokens(self, user_id: int) -> TokenPairSchema:
+        access_token = token_helper.create_access_token(user_id)
         refresh_token = token_helper.create_refresh_token()
         refresh_hash = token_helper.hash_session_token(refresh_token)
-        access_token = token_helper.create_access_token(user_id)
         expires_at = self._refresh_expiry()
-        token_helper.create_refresh_token()
+        await self.auth_repo.create_refresh_token(user_id=user_id,token_hash=refresh_hash,expires=expires_at)
         await self.auth_repo.commit()
-        return TokenPair(access_token=access_token, refresh_token=refresh_token)
+        return TokenPairSchema(access_token=access_token, refresh_token=refresh_token)
 class UserService:
     def __init__(self,repo:UserRepository):
         self.repo = repo
