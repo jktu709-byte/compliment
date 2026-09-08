@@ -23,12 +23,12 @@ async def test_db():
     return {"msg":"Everything's ok"}
 
 @compl_router.post("/data/input")
-async def append_data(
+def append_data(
     service:ComplimentService,
     json_file:UploadFile = File(...),
     ):
     try:    
-        res = await service.input_data_from_file(json_file)
+        res = service.input_data_from_file(json_file)
     except Exception as e:  # noqa: BLE001
         if e:
             print(f"Ошибка получена {e.__class__}")

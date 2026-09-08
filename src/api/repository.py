@@ -22,7 +22,8 @@ class UserRepository(Repository):
         res = await self.session.execute(select(User).where(User.email == email))
         return res.scalar_one_or_none()
     
-    async def get_user_by_id(self,user_id:int)-> User|None: return await self.session.get(User, user_id)
+    async def get_user_by_id(self,user_id:int)-> User|None: 
+        return await self.session.get(User, user_id)
     
     async def create_user(self,u_name:str,u_email:str,u_gender:Gender,u_password_hash:str):
         user = User(name = u_name,u_email = u_email,gender = u_gender,password_hash = u_password_hash)

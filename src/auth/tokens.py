@@ -2,14 +2,15 @@ import hashlib
 import secrets
 from datetime import datetime, timedelta, timezone
 
-from jwt import JWT
+import jwt
+from auth_config import auth_settings
 
 
 # Отвественен за простые операции типо создания/удаления/хэширования паролей, токенов и подобной мути, помогатор проще говоря
 class TokenHelper:
     def __init__(self) -> None:
-        self.token_jwt = JWT()
-    
+        self.secret_key = auth_settings.jwt_secret_key
+        
     def generate_sesion_token(self) -> tuple[str,str]:
         """Создает пару значений (сырой токен, хэш)"""
         token = secrets.token_urlsafe(32)
@@ -26,12 +27,16 @@ class TokenHelper:
     def create_refresh_token(self) -> str:
         return secrets.token_urlsafe(50)
         
-    def decode_token(self) -> dict:
-        payload = self.token_jwt.decode() # type: ignore #токен, ключ, алгоритм шифрования
+    def decode_token(self,token) -> dict:
+        payload = jwt.decode(jwt=token) # type: ignore #токен, ключ, алгоритм шифрования
         return payload
     
-    def _create_token(self,user_id:int, token_type:str,expires_minutes:int) -> str:
-        """Собирает JWT c указанным типом и временем жизни"""
+    def _create_token(
+    self,
+    user_id: int,
+    token_type: str,
+    expires_minutes: int):
+        """Собирает JWT с указанным типом и временем жизни."""
         now = datetime.now(timezone.utc)
         expires = now + timedelta(minutes=expires_minutes)
 
@@ -42,7 +47,11 @@ class TokenHelper:
             "exp": int(expires.timestamp()),
             "iss": "Auth",
         }
-                
-        return self.token_jwt.encode(payload=payload)
+
+        return jwt.encode(
+            payload,
+            self.secret_key,
+            algorithm="HS256",
+        )
 # Если не сделать экземпляр класса, тогда везде будет требоваться навязчивый self и портить жизнь
 token_helper = TokenHelper()
