@@ -16,6 +16,7 @@ class UserRepository(Repository):
         querry = await self.session.execute(select(User.role).where(User.id == user_id))
         return querry
     async def add_history(self,user_id:int): self.session.add(instance=History) #instance= куда добавить, конкретно что добавляем
+    
     async def get_user_by_name(self,name:str)-> Result[tuple[User]]|None: return await self.session.execute(select(User).where(User.name == name))
     
     async def get_user_by_email(self,email:str) -> User|None: 
@@ -89,9 +90,9 @@ class AuthRepository(Repository):
     async def create_refresh_token(self, user_id:int, token_hash: str, expires:datetime):
         refresh_token = RefreshToken(user_id = user_id,token_hash = token_hash,expires_at = expires)
         # крч await сдедует прописывать тогда, когда я обращаюсь к бд и получаю от нее какой либо ответ
-        # например метод add() просто закидывает запись в очередь на запоминание и ему ответ, а то есть await не требуется
+        # например метод add() закидывает запись в очередь на запоминание и ему ответ не требуется
         self.session.add(refresh_token)
-        # А вот flush() уже закидывает данные в базу и ему нужен await для получения ответа и налаживания контакта с базой
+        # А вот flush() уже закидывает данные в базу и ему нужен await для получения ответа и контакта с бд
         await self.session.flush()
     
     async def get_refresh_token(self,token_hash):
@@ -99,5 +100,6 @@ class AuthRepository(Repository):
     
     async def delete_refresh_token(self,token_obj:RefreshToken):
         return self.session.delete(token_obj)
+    
     async def commit(self):
             await self.session.commit()
