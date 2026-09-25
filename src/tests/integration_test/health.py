@@ -9,5 +9,5 @@ async def check_db_conn()-> bool:
         async with async_engine.begin() as conn:
             await conn.execute(text("SELECT 1"))
         return True
-    except Exception:
+    except Exception: # noqa: BLE001
         return False
