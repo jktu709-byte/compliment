@@ -10,7 +10,7 @@ from src.exceptions.semantic_exceptions import (
     UserNotFoundError,
 )
 from src.schemas.auth import LoginRequest, RefreshRequest, TokenPairSchema
-from src.utils.depends import get_service
+from src.utils.depends import get_service  # type: ignore 
 
 auth_router = APIRouter(prefix="/auth",tags=["Auth"])
 
@@ -49,7 +49,7 @@ async def login(data:LoginRequest,response:Response,service:AuthService = Depend
         raise HTTPException(status.HTTP_400_BAD_REQUEST,detail= str(e)) from e
     _set_cookies_settings(response,acces,refresh)
     return TokenPairSchema(access_token=acces,refresh_token=refresh)
-        
+       
 @auth_router.get("/tokens/refresh")
 async def refresh_token(data:RefreshRequest,response:Response,service:AuthService = Depends(get_service)):
     try:

@@ -12,7 +12,7 @@ async_engine = create_async_engine(
     pool_pre_ping = True
 )
 
-async_session = async_sessionmaker(async_engine,expire_on_commit=False)
+async_session = async_sessionmaker(async_engine,class_= AsyncSession,expire_on_commit=False)
 # Нужно импортировать все модели до Base.metadata.create_all. Без импорта их просто не видят
 async def init_db():
     async with async_engine.begin() as conn:

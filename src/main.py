@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware  #noqa
 
 from src.core.database import init_db
+from src.exceptions.handlers import app_error_hadler
+from src.exceptions.semantic_exceptions import AppError
 from src.routers.auth import auth_router
 from src.routers.compliments import compl_router
 from src.routers.users import user_router
@@ -16,6 +18,7 @@ async def app_lifespan(app:FastAPI):
     yield
 
 app = FastAPI(lifespan= app_lifespan)
+app.add_exception_handler(AppError,app_error_hadler) # pyright: ignore[reportArgumentType]
 # с Корс погоди пока что
 # app.add_middleware(CORSMiddleware,allow_origins = "*")
 # объединяем весь функционал в один большой пласт
