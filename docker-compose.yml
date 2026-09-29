@@ -1,35 +1,43 @@
-# version: '3.9'
 services:
   db:
-    image: postgres:18
+    image: postgres:16
     restart: always
     container_name: compliment_base
+    networks:
+      - compliment_net
     # Если база упадет, перезапуск
     healthcheck: 
-      test: ["CMD-SHELL", "pg_isready -U compliment_user"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 3s
       retries: 5
-
-    # Сборка 
+    # путь к файлу с переменными бд 
     env_file:
-      - src/core/DB.env
+      - ./.env
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
+      - ./baskups:/data
+    # порты пробрасываются для внешних подключений, дабы до сервиса можно было достучаться снаружи
     ports:
-      - 5432:5432
-      
+      - 5433:5432
   app:
     build: 
-      context: C:\DEV\nothing\Compliment_app\
+      context: .
       dockerfile: Dockerfile 
     ports:
       - 8000:8000
     container_name: compliment
+    networks:
+      - compliment_net
     env_file:
-      - C:\DEV\nothing\Compliment_app\docker.env
+      - ./.env
+    environment:
+      - PYTHONPATH=/app
     depends_on:
       db:
         condition: service_healthy
-      
+    #restart: on-failure
 volumes:
   postgres_data:
+networks:
+  compliment_net:
+    driver: bridge

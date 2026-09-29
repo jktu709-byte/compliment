@@ -1,11 +1,27 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager #noqa
-from src.api.routers import router as comp_router
+from fastapi.middleware.cors import CORSMiddleware  #noqa
 
-app = FastAPI()
-app.add_middleware(CORSMiddleware,allow_origins = "*")
-app.include_router(router=comp_router)
+from src.core.database import init_db
+from src.exceptions.handlers import app_error_hadler
+from src.exceptions.semantic_exceptions import AppError
+from src.routers.auth import auth_router
+from src.routers.compliments import compl_router
+from src.routers.users import user_router
 
-# if __name__ == "__main__":
-#     uvicorn.run(app = "src.main:app",host="0.0.0.0",reload=True,port=8000)
+
+# Засунуть сюда функционал инициализации бд
+@asynccontextmanager
+async def app_lifespan(app:FastAPI):
+    await init_db()
+    yield
+
+app = FastAPI(lifespan= app_lifespan)
+app.add_exception_handler(AppError,app_error_hadler) # pyright: ignore[reportArgumentType]
+# с Корс погоди пока что
+# app.add_middleware(CORSMiddleware,allow_origins = "*")
+# объединяем весь функционал в один большой пласт
+app.include_router(router=compl_router)
+app.include_router(router=user_router)
+app.include_router(router=auth_router) 

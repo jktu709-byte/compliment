@@ -1,10 +1,8 @@
-
-.env
+.git
 __pycache__
-whatnext.md
+.pytest_cache
 deco.ipynb
+whatnext.md
 greenlet_check.py
 multiprocessing.py
 .envrc
-.vscode/
-
