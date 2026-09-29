@@ -7,7 +7,7 @@ from src.core.database import async_session
 
 
 @pytest.fixture
-async def get_test_session() -> AsyncGenerator[AsyncSession|None]:
+async def test_session() -> AsyncGenerator[AsyncSession,None]:
     async with async_session() as session:
         yield session
         await session.rollback()
