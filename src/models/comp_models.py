@@ -7,7 +7,6 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 class BDBase(DeclarativeBase):
     pass
-#Насчет пола просто вьебу выпадающий список так будет проще
 class Gender(str,Enum):
     male = "male"
     female = "female"
