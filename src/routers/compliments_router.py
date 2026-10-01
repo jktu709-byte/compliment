@@ -4,15 +4,13 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
 from src.api.service import ComplimentService
 from src.decorators.test_conn_deco import require_db_conn
-from src.exceptions.semantic_exceptions import (
-    ComplimentNotFoundError
-)
+from src.exceptions.semantic_exceptions import ComplimentNotFoundError
 from src.schemas.comp_schemas import (
     ComplimentHistoryResponse,
     ComplimentListResponse,
     ComplimentResponse,
 )
-from src.utils.depends import get_service
+from src.utils.depends import get_service  #type:ignore
 
 compl_router = APIRouter(prefix="/compliments",
                    tags=["Comliments"])
@@ -34,7 +32,7 @@ def append_data(
             print(f"Ошибка получена {e.__class__}")
         if not e:
             print("Всё прошло отлично")
-    return res
+    
 
 #  what should response system if db is empty? 204 - no content
 @compl_router.get("/data/random/{user_id}",response_model=ComplimentResponse)

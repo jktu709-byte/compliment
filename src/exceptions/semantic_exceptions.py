@@ -29,7 +29,7 @@ class RefreshTokenNotFoundError(AppError):
 
 class RefreshTokenExpiredError(AppError):
     """Истек рефреш токен"""
-    code = "REFRSH_TOKEN_EXPIRED"
+    code = "REFRESH_TOKEN_EXPIRED"
     msg = "Refresh token expired"
     
 class ComplimentAlreadyExistsError(AppError):

@@ -7,7 +7,7 @@ class User_Factory:
     
     def __init__(self,session:AsyncSession) -> None:
         self.session = session
-    
+        
     async def create_user(
         self,
         name="test_name",

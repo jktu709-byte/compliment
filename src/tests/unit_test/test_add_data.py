@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.schemas.comp_schemas import ComplimentAppendDTO
-from src.tests.factory.complmnt import Complmnt_Factory
+from src.tests.factory.complmnt_factory import Complmnt_Factory
 
 
 @pytest.fixture

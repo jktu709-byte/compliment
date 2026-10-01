@@ -1,4 +1,4 @@
- # I use my crud functional for solving business problems.
+ # Split responsobility
 import json
 import random
 from datetime import datetime, timedelta, timezone
@@ -143,7 +143,8 @@ class AuthService:
         # прописываем удаление токена
         now = datetime.now(timezone.utc)
         if stored.expires_at <= now:
-             await self.auth_repo.delete_refresh_token(stored) #можно удалить пакетами через cron
+             #можно удалить пакетами через cron
+             await self.auth_repo.delete_refresh_token(stored) 
              raise RefreshTokenExpiredError()
         return stored
         
@@ -154,6 +155,7 @@ class AuthService:
         return user
 
     def _refresh_expiry(self) -> datetime:
+        """Продлевает токен по мере расходования"""
         return datetime.now(timezone.utc) + timedelta(minutes=auth_settings.refresh_token_expires_minutes)
     # здесь собирается токен для последующего использования в логине
     async def _issue_tokens(self, user_id: int) -> TokenPairSchema:

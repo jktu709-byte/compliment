@@ -63,7 +63,7 @@ async def refresh_token(data:RefreshRequest,response:Response,service:AuthServic
     except AppError as err: 
         raise HTTPException(status.HTTP_400_BAD_REQUEST,detail= str(err)) from err
     # настраиваем куки перед отправкой данных
-    _set_cookies_settings(response = ...,acces_token=pair.acces,refresh_token=pair.refresh)
+    _set_cookies_settings(response,acces_token=pair.access_token,refresh_token=pair.refresh_token)
     return pair
 
 # @auth_router.get("/me")

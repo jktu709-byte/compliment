@@ -18,11 +18,12 @@ class AuthSettings(BaseSettings):
     refresh_token_expires_minutes: int = 60 * 24 * 30
     access_cookie_name: str = "access_token"
     refresh_cookie_name: str = "refresh_token"
-    # session_ttl_minutes: int = 60 * 24
-    # session_extend_minutes: int = 60 * 24 * 7
-    # session_rolling_interval_minutes: int = 10
-    # session_absolute_timeout_days: int = 30
-    # session_cookie_name: str = "session_id"
-    # session_cookie_secure: bool = False
+    # сессий накидал потому что я олух и пока не знаю как иначе+просто пусть будет
+    session_ttl_minutes: int = 60 * 24
+    session_extend_minutes: int = 60 * 24 * 7
+    session_rolling_interval_minutes: int = 10
+    session_absolute_timeout_days: int = 30
+    session_cookie_name: str = "session_id"
+    session_cookie_secure: bool = False
     # session_cookie_domain: str | None = None
 auth_settings = AuthSettings

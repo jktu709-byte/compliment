@@ -6,9 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware  #noqa
 from src.core.database import init_db
 from src.exceptions.handlers import app_error_hadler
 from src.exceptions.semantic_exceptions import AppError
-from src.routers.auth import auth_router
-from src.routers.compliments import compl_router
-from src.routers.users import user_router
+from src.routers.auth_router import auth_router
+from src.routers.compliments_router import compl_router
+from src.routers.users_router import user_router
 
 
 # Засунуть сюда функционал инициализации бд

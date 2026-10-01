@@ -25,6 +25,7 @@ class TokenHelper:
         return self._create_token(user_id,"access",15)
     
     def create_refresh_token(self) -> str:
+        """Формирует JWT refresh-token"""
         return secrets.token_urlsafe(50)
         
     def decode_token(self,token) -> dict:

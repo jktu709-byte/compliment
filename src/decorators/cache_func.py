@@ -5,7 +5,7 @@ from functools import lru_cache
 @lru_cache
 def func_meme():
     time.sleep(10)
-    return "8-800-555-35-35"
+    return "Доброе утро"
 
 print(func_meme())
 

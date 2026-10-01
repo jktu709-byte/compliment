@@ -6,7 +6,7 @@ from src.models.comp_models import Gender
 
 
 # Валидация ответа
-class UserCreate(BaseModel):
+class UserCreateSchema(BaseModel):
     name:str
     email:EmailStr
     gender:Gender
