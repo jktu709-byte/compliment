@@ -14,9 +14,9 @@ class Gender(str,Enum):
     neutral = "neutral"
 
 class Role(str,Enum):
-    user = "user"
-    admin = "admin"
-    moderation = "moderation"
+    BASEUSER = "BASEUSER"
+    ADMIN = "ADMIN"
+    MODERATOR = "MODERATOR"
 
 class Status(str, Enum):
     ACTIVE = "ACTIVE"

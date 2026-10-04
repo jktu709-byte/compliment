@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.models.comp_models import User
+from src.models.comp_models import Role, User
 
 
 class User_Factory:
@@ -8,15 +8,42 @@ class User_Factory:
     def __init__(self,session:AsyncSession) -> None:
         self.session = session
         
-    async def create_user(
+    async def base_test_user(
         self,
-        name="test_name",
-        email="test_email",
-        role="test_role",
-        password_hash="test_hash"
-        ):
-        user = User(name=name,email=email,role=role,password_hash=password_hash)
-        self.session.add(user)
-        await self.session.flush([user])
-        return user
+        role=Role.BASEUSER,
+        ) -> User:
+        test_user = User(
+            name="test_name",
+            email="test_email123@gmail.com",
+            role=role,
+            password_hash="random_hash")
+        self.session.add(test_user)
+        await self.session.flush([test_user])
+        return test_user
     
+    async def admin_test_user(
+            self,
+            role=Role.ADMIN,
+            ) -> User:
+            test_user = User(
+                name="test_name",
+                email="test_email123@gmail.com",
+                role=role,
+                password_hash="random_hash")
+            self.session.add(test_user)
+            await self.session.flush([test_user])
+            return test_user
+        
+    async def moderator_test_user(
+            self,
+            role=Role.MODERATOR,
+            ) -> User:
+            test_user = User(
+                name="test_name",
+                email="test_email123@gmail.com",
+                role=role,
+                password_hash="random_hash")
+            self.session.add(test_user)
+            await self.session.flush([test_user])
+            return test_user
+        
