@@ -1,7 +1,10 @@
-from collections.abc import AsyncGenerator #noqa
-from sqlalchemy.ext.asyncio import create_async_engine,AsyncSession,async_sessionmaker #noq
+from collections.abc import AsyncGenerator
+
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
 from src.core.db_config import DB_URL
-from src.models.comp_models import BDBase,Compliment,User,History #noqa
+from src.models.comp_models import BDBase
+
 # добавить отображение ошибок
 
 def create_engine_factory(some_url:str):
@@ -20,7 +23,6 @@ async def init_db():
     async with db_engine.begin() as conn:
         await conn.run_sync(BDBase.metadata.create_all)
         
-
 async def reset_db():
     async with db_engine.begin() as conn:
         await conn.run_sync(BDBase.metadata.drop_all)

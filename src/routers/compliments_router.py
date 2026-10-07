@@ -2,7 +2,7 @@
 # Think about addresses 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
-from src.api.service import ComplimentService
+from src.compliments.service import ComplimentService
 from src.decorators.test_conn_deco import require_db_conn
 from src.exceptions.semantic_exceptions import ComplimentNotFoundError
 from src.schemas.comp_schemas import (

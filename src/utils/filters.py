@@ -1,4 +1,4 @@
-from sqlalchemy import func, or_, select  # noqa: EXE002
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.comp_models import Compliment, Gender

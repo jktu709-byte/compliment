@@ -4,7 +4,7 @@ from typing import Any
 
 from fastapi import HTTPException
 
-from src.tests.api_test.health import check_db_conn
+from src.tests.integration_tests.health import check_db_conn
 
 
 def require_db_conn(func:Callable[...,Awaitable[Any]]):

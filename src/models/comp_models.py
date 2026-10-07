@@ -7,7 +7,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 class BDBase(DeclarativeBase):
     pass
-#Насчет пола просто вьебу выпадающий список так будет проще
+
 class Gender(str,Enum):
     male = "male"
     female = "female"
@@ -52,7 +52,6 @@ class History(BDBase):
     user:Mapped["User"] = relationship("User",back_populates="user_history")
     created_at:Mapped[datetime] = mapped_column(DateTime,server_default=text("TIMEZONE('utc',now())"))
 
-# Later I must setup a verification,authentificetion,autorization and etc.
 class RefreshToken(BDBase):
     __tablename__ = "refresh_token"
     id:Mapped[int] = mapped_column(primary_key=True)

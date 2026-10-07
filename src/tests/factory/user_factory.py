@@ -8,10 +8,7 @@ class User_Factory:
     def __init__(self,session:AsyncSession) -> None:
         self.session = session
         
-    async def base_test_user(
-        self,
-        role=Role.BASEUSER,
-        ) -> User:
+    async def base_test_user(self,role=Role.BASEUSER) -> User:
         test_user = User(
             name="test_name",
             email="test_email123@gmail.com",
@@ -21,10 +18,7 @@ class User_Factory:
         await self.session.flush([test_user])
         return test_user
     
-    async def admin_test_user(
-            self,
-            role=Role.ADMIN,
-            ) -> User:
+    async def admin_test_user(self,role=Role.ADMIN) -> User:
             test_user = User(
                 name="test_name",
                 email="test_email123@gmail.com",
@@ -34,10 +28,7 @@ class User_Factory:
             await self.session.flush([test_user])
             return test_user
         
-    async def moderator_test_user(
-            self,
-            role=Role.MODERATOR,
-            ) -> User:
+    async def moderator_test_user(self,role=Role.MODERATOR) -> User:
             test_user = User(
                 name="test_name",
                 email="test_email123@gmail.com",

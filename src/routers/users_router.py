@@ -1,6 +1,6 @@
 from fastapi import APIRouter,Depends, HTTPException,status #noqa
-from src.api.service import UserService
-from src.schemas.auth import UserCreateSchema
+from src.user.service import UserService
+from src.schemas.auth_schemas import UserCreateSchema
 from src.utils.depends import get_service  #type:ignore
 from src.exceptions.semantic_exceptions import UserAlreadyExistsError,AppError
 user_router = APIRouter("/users",tags=['Пользователи']) # type: ignore

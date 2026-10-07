@@ -14,8 +14,9 @@ class UserCreateSchema(BaseModel):
 
 class UserResponse(BaseModel):
     ...
-class LoginRequest(BaseModel):
+class LoginRequestSchema(BaseModel):
     name: str
+    email:str
     password: str
 
 class UserRead(BaseModel):

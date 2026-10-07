@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
-from src.api.service import AuthService
 from src.auth.auth_config import auth_settings
+from src.auth.auth_service import AuthService
 from src.exceptions.semantic_exceptions import (
     AppError,
     InvalidCredentialsError,
@@ -9,7 +9,7 @@ from src.exceptions.semantic_exceptions import (
     RefreshTokenNotFoundError,
     UserNotFoundError,
 )
-from src.schemas.auth import LoginRequest, RefreshRequest, TokenPairSchema
+from src.schemas.auth_schemas import LoginRequestSchema, RefreshRequest, TokenPairSchema
 from src.utils.depends import get_service  # type: ignore 
 
 auth_router = APIRouter(prefix="/auth",tags=["Auth"])
@@ -36,11 +36,11 @@ def _set_cookies_settings(response:Response,acces_token:str,refresh_token:str):
             path="/"
         )
     
-@auth_router.get("/login/jwt",summary= "Вход JWT")
-async def login(data:LoginRequest,response:Response,service:AuthService = Depends(get_service)) -> TokenPairSchema:
+@auth_router.post("/login/jwt",summary= "Вход JWT")
+async def login(data:LoginRequestSchema,response:Response,service:AuthService = Depends(get_service)) -> TokenPairSchema:
     try:
         # вводим данные 
-        acces,refresh = await service.login(data.name,data.password)
+        acces,refresh = await service.login(data.email,data.password)
     # при неверном вводе пароля или логина выкидываем ошибку
     except InvalidCredentialsError as e:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED,detail=str(e)) from e

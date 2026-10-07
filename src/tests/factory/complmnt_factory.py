@@ -7,7 +7,10 @@ class Complmnt_Factory:
         self.session = session
         
     async def create_complmnt(self) -> Compliment:
-        complmnt = Compliment(title= "test_title",point= "test_point",gender=Gender.neutral)
+        complmnt = Compliment(
+            title= "test_title",
+            point= "test_point",
+            gender=Gender.neutral)
         self.session.add(complmnt)  # type: ignore
         await self.session.flush([complmnt])
         return complmnt
