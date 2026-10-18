@@ -3,14 +3,14 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 from models.comp_models import User,BDBase  
-from core.db_config import DB_URL
+from core.db_config import db_settings
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
     
-dburl = DB_URL.update_query_dict({"async_fallback":"true"})
+dburl = db_settings.DB_URL.update_query_dict({"async_fallback":"true"})
 # Дело в том, что базовый URL функция не принимает и поэтому приходится парсить url как строку. +"?async_fallback = True"
 config.set_main_option("sqlalchemy.url",dburl.render_as_string())
 target_metadata = BDBase.metadata

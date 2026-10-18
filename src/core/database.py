@@ -3,7 +3,7 @@ from collections.abc import AsyncGenerator
 from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from src.core.db_config import DB_URL
+from src.core.db_config import db_settings
 from src.models.comp_models import BDBase
 
 # добавить отображение ошибок
@@ -17,7 +17,7 @@ def create_engine_factory(some_url:URL):
         pool_pre_ping = True
     )
     return engine
-db_engine = create_engine_factory(DB_URL)
+db_engine = create_engine_factory(db_settings.DB_URL)
 db_session = async_sessionmaker(db_engine,class_= AsyncSession,expire_on_commit=False)
 # Нужно импортировать все модели до Base.metadata.create_all. Без импорта их просто не видят
 async def init_db():

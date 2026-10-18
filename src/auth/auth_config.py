@@ -1,7 +1,7 @@
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import URL
-from src.core.db_config import DB_URL
+from src.core.db_config import db_settings
 
 class AuthSettings(BaseSettings):
     # Крч это буквально упрощение жизни. Окружением заботится сам Pydantic и все отлично
@@ -12,7 +12,7 @@ class AuthSettings(BaseSettings):
         env_file_encoding = "utf-8",
         )
     app_name:str = "Auth" 
-    database_url: URL = DB_URL
+    database_url: URL = db_settings.DB_URL
     jwt_secret_key: str = Field(validation_alias="SECRET_KEY")
     jwt_secret_algo: str = "HS256"
     access_token_expires_minutes: int = 15
