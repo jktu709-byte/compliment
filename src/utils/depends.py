@@ -1,6 +1,10 @@
-from fastapi import Depends, HTTPException,Request,status #noqa
-from src.api.repository import ComplimentRepository,UserRepository,AuthRepository
-from src.api.service import ComplimentService,UserService,AuthService
+from fastapi import Depends, HTTPException,Request,status 
+from src.compliments.repository import ComplimentRepository
+from src.auth.auth_repository import AuthRepository
+from src.user.repository import UserRepository
+from src.user.service import UserService
+from src.compliments.service import ComplimentService
+from src.auth.auth_service import AuthService
 from src.core.database import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.auth_config import auth_settings

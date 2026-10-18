@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator
 
+from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.core.db_config import DB_URL
@@ -7,7 +8,7 @@ from src.models.comp_models import BDBase
 
 # добавить отображение ошибок
 
-def create_engine_factory(some_url:str):
+def create_engine_factory(some_url:URL):
     engine = create_async_engine(
         echo=True,
         url = some_url,

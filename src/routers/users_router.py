@@ -1,12 +1,12 @@
-from fastapi import APIRouter,Depends, HTTPException,status #noqa
+from fastapi import APIRouter,Depends, HTTPException,status 
 from src.user.service import UserService
 from src.schemas.auth_schemas import UserCreateSchema
-from src.utils.depends import get_service  #type:ignore
+from src.utils.depends import get_user_service  
 from src.exceptions.semantic_exceptions import UserAlreadyExistsError,AppError
-user_router = APIRouter("/users",tags=['Пользователи']) # type: ignore
+user_router = APIRouter(prefix="/users",tags=['Пользователи'])
 
 @user_router.post("/register",status_code=201,summary="Регистрация пользователя")
-async def register(payload:UserCreateSchema,service: UserService = Depends(get_service)):
+async def register(payload:UserCreateSchema,service: UserService = Depends(get_user_service)):
     try:
         return await service.register(name=payload.name,email=payload.email,gender=payload.gender,password=payload.password)    
     except UserAlreadyExistsError as e:

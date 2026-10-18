@@ -10,7 +10,7 @@ from src.exceptions.semantic_exceptions import (
     UserNotFoundError,
 )
 from src.schemas.auth_schemas import LoginRequestSchema, RefreshRequest, TokenPairSchema
-from src.utils.depends import get_service  # type: ignore 
+from src.utils.depends import get_auth_service  # type: ignore 
 
 auth_router = APIRouter(prefix="/auth",tags=["Auth"])
 
@@ -37,7 +37,7 @@ def _set_cookies_settings(response:Response,acces_token:str,refresh_token:str):
         )
     
 @auth_router.post("/login/jwt",summary= "Вход JWT")
-async def login(data:LoginRequestSchema,response:Response,service:AuthService = Depends(get_service)) -> TokenPairSchema:
+async def login(data:LoginRequestSchema,response:Response,service:AuthService = Depends(get_auth_service)) -> TokenPairSchema:
     try:
         # вводим данные 
         acces,refresh = await service.login(data.email,data.password)
@@ -51,7 +51,7 @@ async def login(data:LoginRequestSchema,response:Response,service:AuthService = 
     return TokenPairSchema(access_token=acces,refresh_token=refresh)
        
 @auth_router.get("/tokens/refresh")
-async def refresh_token(data:RefreshRequest,response:Response,service:AuthService = Depends(get_service)):
+async def refresh_token(data:RefreshRequest,response:Response,service:AuthService = Depends(get_auth_service)):
     try:
         pair = await service.refresh_token(data.refresh_token)
     except RefreshTokenExpiredError as err:

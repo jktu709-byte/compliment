@@ -3,7 +3,7 @@ import secrets
 from datetime import datetime, timedelta, timezone
 
 import jwt
-from auth_config import auth_settings
+from src.auth.auth_config import auth_settings
 
 
 # Отвественен за простые операции типо создания/удаления/хэширования паролей, токенов и подобной мути, помогатор проще говоря

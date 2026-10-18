@@ -1,9 +1,9 @@
 # Здесь подготавливается окружение, переменные, ресурсы, состояния для тестирования
-# Пока тормозну. Мне нужно переписать логику создания тестовых/продакшн сессий и движка через url
 from collections.abc import AsyncGenerator  # noqa: F401
 
 import pytest
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -17,7 +17,7 @@ from src.tests.factory.user_factory import User_Factory
 
 
 @pytest.fixture
-async def create_test_engine(TEST_URL):
+async def create_test_engine(TEST_URL:URL):
     test_engine = create_engine_factory(TEST_URL)
     async with test_engine.begin() as connection:
         await connection.run_sync(BDBase.metadata.create_all)
