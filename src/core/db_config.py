@@ -33,7 +33,8 @@ class DBSettings(BaseSettings):
             database=self.DB_NAME,
             username=self.DB_USER
             )
-db_settings = DBSettings()            # type: ignore
+# Продакшн
+db_settings = DBSettings() # type: ignore
 # def check_env():
 #     pass
     
