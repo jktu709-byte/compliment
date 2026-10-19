@@ -1,9 +1,15 @@
 tests.env
 .git
-__pycache__
+**/__pycache__
 .pytest_cache
 deco.ipynb
 whatnext.md
 greenlet_check.py
 multiprocessing.py
 .envrc
+.env
+.venv
+.vscode
+backups
+.gitlab-ci.yml
+tests

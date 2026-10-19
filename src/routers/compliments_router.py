@@ -1,0 +1,62 @@
+# This is something like DTO, naybe transport stuff
+# Think about addresses
+from typing import Annotated
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile  # noqa: F401
+from src.compliments.service import ComplimentService
+from src.decorators.conn_deco import require_db_conn
+from src.exceptions.semantic_exceptions import ComplimentNotFoundError
+from src.schemas.comp_schemas import (
+    ComplimentListResponse,
+    ComplimentResponse,
+)
+from src.utils.depends import get_compl_service  #type:ignore
+
+compl_router = APIRouter(prefix="/compliments",
+                   tags=["Comliments"])
+
+@compl_router.get("/test")
+@require_db_conn
+async def test_db():
+    return {"msg":"Everything's ok"}
+
+# @compl_router.post("/data/input")
+# def append_data(
+#     service:ComplimentService,
+#     json_file:UploadFile = File(...),
+#     ):
+#     try:    
+#         res = service.input_data_from_file(json_file)
+#     except Exception as e:  
+#         if e:
+#             print(f"Ошибка получена {e.__class__}")
+#         if not e:
+#             print("Всё прошло отлично")
+    
+
+#  what should response system if db is empty? 204 - no content
+@compl_router.get("/data/random/{user_id}",response_model=ComplimentResponse)
+async def get_user_compliment(user_id:int,service:ComplimentService = Depends(get_compl_service)):
+
+    ans = await service.get_compliment_for_user(user_id)
+    if ans is ComplimentNotFoundError():
+        raise HTTPException(status_code = 204, detail= ComplimentNotFoundError.msg)
+    return ans
+
+@compl_router.get("/data/all",response_model= ComplimentListResponse)
+async def compliments_list(service: ComplimentService = Depends(get_compl_service)):
+    res = await service.list_compliments()
+    return res
+# payload  = put,post   
+@compl_router.put("/data/{compliment_id}")
+async def update_compliment(compliment_id:int,service:ComplimentService = Depends(get_compl_service)):
+    res = await service.change_compliment(compliment_id)
+    if res is None:
+        raise HTTPException(status_code=404, detail="This compliment doesn't exist")
+    return res
+
+@compl_router.get("/history/{user_id}",response_model=ComplimentResponse)
+async def get_user_history(user_id:int,service:ComplimentService = Depends(get_compl_service)):
+    res = await service.get_history(user_id=user_id)
+    if res is ComplimentNotFoundError():
+        raise HTTPException(status_code= 204, detail=ComplimentNotFoundError.msg)
+    return res

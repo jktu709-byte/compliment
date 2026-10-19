@@ -5,7 +5,7 @@ services:
     container_name: compliment_base
     networks:
       - compliment_net
-    # Если база упадет, перезапуск
+    # Проверка контенера
     healthcheck: 
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 3s
@@ -15,7 +15,7 @@ services:
       - ./.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./baskups:/data
+      - ./backups:/data
     # порты пробрасываются для внешних подключений, дабы до сервиса можно было достучаться снаружи
     ports:
       - 5433:5432
@@ -32,8 +32,10 @@ services:
       - ./.env
     environment:
       - PYTHONPATH=/app
+    # зависит от сервиса 
     depends_on:
       db:
+        # пока сервис не был проверен healthcheck
         condition: service_healthy
     #restart: on-failure
 volumes:

@@ -1,10 +1,10 @@
 tests.env
 .env
-__pycache__
+__pycache__/
 whatnext.md
 deco.ipynb
 greenlet_check.py
 multiprocessing.py
 .envrc
 .vscode/
-
+*.pyc
