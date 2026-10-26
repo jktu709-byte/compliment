@@ -10,7 +10,7 @@ from src.exceptions.semantic_exceptions import (
 )
 from src.models.comp_models import Compliment, Gender, History  #noqa
 from src.schemas.comp_schemas import ComplimentAppendDTO
-from src.user.repository import UserRepository
+from src.users.repository import UserRepository
 
 
 class ComplimentService:

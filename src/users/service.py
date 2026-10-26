@@ -3,7 +3,7 @@ from src.exceptions.semantic_exceptions import (
     UserAlreadyExistsError,
 )
 from src.models.comp_models import Gender
-from src.user.repository import UserRepository
+from src.users.repository import UserRepository
 
 
 class UserService:

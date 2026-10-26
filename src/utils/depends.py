@@ -1,8 +1,8 @@
 from fastapi import Depends, HTTPException,Request,status 
 from src.compliments.repository import ComplimentRepository
 from src.auth.auth_repository import AuthRepository
-from src.user.repository import UserRepository
-from src.user.service import UserService
+from src.users.repository import UserRepository
+from src.users.service import UserService
 from src.compliments.service import ComplimentService
 from src.auth.auth_service import AuthService
 from src.core.database import get_session
@@ -12,9 +12,6 @@ import jwt
 from src.auth.tokens import token_helper
 from src.exceptions.semantic_exceptions import RefreshTokenNotFoundError, UserNotFoundError
 from src.models.comp_models import User
-
-
-
 
 def get_compl_repo(session:AsyncSession = Depends(get_session))-> ComplimentRepository:
         return ComplimentRepository(session)

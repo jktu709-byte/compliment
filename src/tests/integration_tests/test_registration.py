@@ -1,6 +1,6 @@
 import pytest #noqa
 from httpx import AsyncClient
-from src.user.repository import UserRepository
+from src.users.repository import UserRepository
 
 
 async def test_register(client:AsyncClient,service:UserRepository):

@@ -12,7 +12,7 @@ from src.exceptions.semantic_exceptions import (
 )
 from src.models.comp_models import User
 from src.schemas.auth_schemas import TokenPairSchema
-from src.user.repository import UserRepository
+from src.users.repository import UserRepository
 
 
 class AuthService:

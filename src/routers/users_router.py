@@ -1,5 +1,5 @@
 from fastapi import APIRouter,Depends, HTTPException,status 
-from src.user.service import UserService
+from src.users.service import UserService
 from src.schemas.auth_schemas import UserCreateSchema
 from src.utils.depends import get_user_service  
 from src.exceptions.semantic_exceptions import UserAlreadyExistsError,AppError

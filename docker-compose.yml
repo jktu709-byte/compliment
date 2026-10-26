@@ -19,6 +19,24 @@ services:
     # порты пробрасываются для внешних подключений, дабы до сервиса можно было достучаться снаружи
     ports:
       - 5433:5432
+  migrate:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PYTHONPATH=/app
+    hostname: POSTGRES_HOST
+    ports:
+      - 5432
+    env_file:
+      ./.env
+    command: alembic upgrade head
+    networks:
+      - compliment_net
+    depends_on:
+      db:
+        condition: service_healthy
+
   app:
     build: 
       context: .
@@ -34,12 +52,13 @@ services:
       - PYTHONPATH=/app
     # зависит от сервиса 
     depends_on:
-      db:
+      migrate:
         # пока сервис не был проверен healthcheck
-        condition: service_healthy
+        condition: service_completed_successfully
     #restart: on-failure
 volumes:
   postgres_data:
+
 networks:
   compliment_net:
     driver: bridge
