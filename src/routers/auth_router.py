@@ -14,10 +14,10 @@ from src.utils.depends import get_auth_service  # type: ignore
 
 auth_router = APIRouter(prefix="/auth",tags=["Auth"])
 
-def _set_cookies_settings(response:Response,acces_token:str,refresh_token:str):
+def _set_cookies_settings(response:Response,access_token:str,refresh_token:str):
     response.set_cookie(
         key= auth_settings.access_cookie_name,
-        value= acces_token,
+        value= access_token,
         # если поставить True - получишь защиту от xss
         httponly=False,
         secure=auth_settings.session_cookie_secure,
@@ -63,7 +63,7 @@ async def refresh_token(data:RefreshRequest,response:Response,service:AuthServic
     except AppError as err: 
         raise HTTPException(status.HTTP_400_BAD_REQUEST,detail= str(err)) from err
     # настраиваем куки перед отправкой данных
-    _set_cookies_settings(response,acces_token=pair.access_token,refresh_token=pair.refresh_token)
+    _set_cookies_settings(response,access_token=pair.access_token,refresh_token=pair.refresh_token)
     return pair
 
 # @auth_router.get("/me")

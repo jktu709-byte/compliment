@@ -11,12 +11,12 @@ class UserRepository:
     def __init__(self,session:AsyncSession) -> None:
         self.session = session
                 
-    async def get_user_role(self,user_id:int):
-        querry = await self.session.execute(
-            select(User.role).
-            where(User.id == user_id)
-        )
-        return querry
+    # async def get_user_role(self,user_id:int):
+    #     querry = await self.session.execute(
+    #         select(User.role).
+    #         where(User.id == user_id)
+    #     )
+    #     return querry
     
     async def add_history(self,user_id:int): 
         self.session.add(instance=History) #instance= куда добавить, конкретно что добавляем
@@ -37,7 +37,7 @@ class UserRepository:
     async def create_user(self,u_name:str,u_email:str,u_gender:Gender,u_password_hash:str):
         user = User(
             name = u_name,
-            u_email = u_email,
+            email = u_email,
             gender = u_gender,
             password_hash = u_password_hash)
         self.session.add(user)

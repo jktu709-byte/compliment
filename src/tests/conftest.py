@@ -7,22 +7,18 @@ from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
 )
-from src.core.database import create_engine_factory
+from src.core.database import create_engine_factory, get_session
 from src.main import app
 from src.models.comp_models import BDBase 
 from src.tests.factory.user_factory import User_Factory
-from src.core.db_config import DBSettings
-from pathlib import Path
+from src.tests.testdb_settings import TESTDBSettings
 
-ENV_TEST = Path(__file__).resolve().parents[2] / "tests.env"
-test_settings = DBSettings(_env_file=ENV_TEST) # type: ignore
-print(test_settings.POSTGRES_HOST, test_settings.POSTGRES_PORT)
 
 @pytest.fixture
 def test_url():
-    settings = DBSettings(_env_file="tests.env") # type: ignore
+    settings = TESTDBSettings() # type: ignore
     assert settings.POSTGRES_DB.startswith("test_")
-    return settings.db_url
+    return settings.test_db_url
 
 @pytest_asyncio.fixture
 async def test_engine(test_url):
@@ -53,7 +49,16 @@ async def test_user(user_factory,test_session:AsyncSession):
     return base_test_user
 
 @pytest_asyncio.fixture
-async def client():
+async def client(test_engine:AsyncEngine):
+    # создаю генератор сессий
+    tengine = async_sessionmaker(test_engine,class_=AsyncSession,expire_on_commit=False)
+    # функция перезаписи сессии
+    async def override_session():
+        async with tengine() as session:
+            yield session
+    # перезаписываю основную сессию на тестовую 
+    app.dependency_overrides[get_session] = override_session
+    # стандартное создание клиента
     async with AsyncClient(transport=ASGITransport(app=app),base_url="https://tests") as async_client:
         yield async_client
-        
+    app.dependency_overrides.clear()

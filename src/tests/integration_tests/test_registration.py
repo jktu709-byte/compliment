@@ -15,8 +15,8 @@ async def test_register(client:AsyncClient,user_service):
             "gender":"male",
             "password":"exapmlepassword123"}
     )
-    assert response.status_code == 200
-    user = await user_service.get_user_by_email(email="john123@example.com")
+    assert response.status_code == 201
+    user = await user_service.get_email("john123@example.com")
     assert user is not None
     assert user.name == "John"
     assert user.password_hash != "exapmlepassword123"

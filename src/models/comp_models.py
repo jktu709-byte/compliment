@@ -39,7 +39,7 @@ class User(BDBase):
     email:Mapped[str] = mapped_column(String,unique=True,index= True)
     gender:Mapped[Gender] = mapped_column(nullable=False,index=True)
     # status:Mapped[Status]= mapped_column(nullable=True)
-    role:Mapped[Role] = mapped_column(nullable=False)
+    # role:Mapped[Role] = mapped_column(nullable=False)
     password_hash:Mapped[str] = mapped_column(String(255),nullable=False,)
     user_history:Mapped[list["History"]] = relationship("History",back_populates="user")
     refresh_tokens:Mapped[list["RefreshToken"]] = relationship("RefreshToken",back_populates="user",cascade="all, delete-orphan")

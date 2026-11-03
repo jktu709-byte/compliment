@@ -22,3 +22,6 @@ class UserService:
             )
         await self.repo.commit()
         return user
+    async def get_email(self,email:str):
+        user = await self.repo.get_user_by_email(email=email)
+        return user

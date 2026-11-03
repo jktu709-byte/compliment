@@ -15,12 +15,14 @@ from src.models.comp_models import User
 
 def get_compl_repo(session:AsyncSession = Depends(get_session))-> ComplimentRepository:
         return ComplimentRepository(session)
-                                    
-def get_compl_service(repo:ComplimentRepository = Depends(get_compl_repo))->ComplimentService:
-        return ComplimentService(repo) # type: ignore
 
 def get_user_repo(session:AsyncSession = Depends(get_session))-> UserRepository:
-        return UserRepository(session)
+        return UserRepository(session)                                    
+def get_compl_service(
+        complmnt_repo:ComplimentRepository = Depends(get_compl_repo),
+        u_repo:UserRepository = Depends(get_user_repo)
+        )->ComplimentService:
+        return ComplimentService(repo=complmnt_repo,u_repo=u_repo)
                                     
 def get_user_service(repo:UserRepository = Depends(get_user_repo))->UserService:
         return UserService(repo)
@@ -28,8 +30,11 @@ def get_user_service(repo:UserRepository = Depends(get_user_repo))->UserService:
 def get_auth_repo(session:AsyncSession = Depends(get_session))-> AuthRepository:
         return AuthRepository(session)
                                     
-def get_auth_service(repo:AuthRepository = Depends(get_user_repo))->AuthService:
-        return AuthService(repo) #type:ignore
+def get_auth_service(
+        a_repo:AuthRepository = Depends(get_auth_repo),
+        u_repo:UserRepository = Depends(get_user_repo)
+        )->AuthService:
+        return AuthService(auth_repo=a_repo,user_repo=u_repo)
 
 async def get_current_user_from_bearer(req:Request,user_repo:UserRepository) -> User:
         raw_token = _extract_token(req)
