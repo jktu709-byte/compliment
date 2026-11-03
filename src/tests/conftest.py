@@ -12,6 +12,11 @@ from src.main import app
 from src.models.comp_models import BDBase 
 from src.tests.factory.user_factory import User_Factory
 from src.core.db_config import DBSettings
+from pathlib import Path
+
+ENV_TEST = Path(__file__).resolve().parents[2] / "tests.env"
+test_settings = DBSettings(_env_file=ENV_TEST) # type: ignore
+print(test_settings.POSTGRES_HOST, test_settings.POSTGRES_PORT)
 
 @pytest.fixture
 def test_url():
@@ -33,11 +38,15 @@ async def test_session(test_engine:AsyncEngine):
     TestSession = async_sessionmaker(test_engine,class_=AsyncSession,expire_on_commit=False)
     async with TestSession() as session:
         yield session
+
+@pytest.fixture
+def user_factory(test_session):
+    return User_Factory(test_session)
 # ТОЛЬКО ДЛЯ ТЕСТОВ С БАЗОЙ ДАННЫХ
 @pytest_asyncio.fixture
-async def test_user(factory:User_Factory,test_session:AsyncSession):
+async def test_user(user_factory,test_session:AsyncSession):
     # Factory создает асинхро:нного клиента
-    base_test_user = factory.base_test_user()
+    base_test_user = user_factory.base_test_user()
     test_session.add(base_test_user)
     await test_session.commit()
     await test_session.refresh(base_test_user)

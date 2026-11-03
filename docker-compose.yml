@@ -1,4 +1,19 @@
 services:
+  db_test:
+    image: postgres:16
+    profiles:
+      - "test"
+    networks:
+      - compliment_net
+    env_file:
+      - ./tests.env
+    tmpfs: /var/lib/postgresql/data
+    healthcheck: 
+      test: ["CMD-SHELL", "pg_isready -U postgres -d test_compliment -h 127.0.0.1"]
+      interval: 3s
+      retries: 5
+    ports:
+      - 5434:5432
   db:
     image: postgres:16
     restart: always
@@ -36,7 +51,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-
   app:
     build: 
       context: .
@@ -58,7 +72,6 @@ services:
     #restart: on-failure
 volumes:
   postgres_data:
-
 networks:
   compliment_net:
     driver: bridge

@@ -8,11 +8,16 @@ user_router = APIRouter(prefix="/users",tags=['Пользователи'])
 @user_router.post("/register",status_code=201,summary="Регистрация пользователя")
 async def register(payload:UserCreateSchema,service: UserService = Depends(get_user_service)):
     try:
-        return await service.register(name=payload.name,email=payload.email,gender=payload.gender,password=payload.password)    
+        return await service.register(
+            name=payload.name,
+            email=payload.email,
+            gender=payload.gender,
+            password=payload.password
+        )    
     except UserAlreadyExistsError as e:
         raise HTTPException(status.HTTP_400_BAD_REQUEST,detail="User already exist") from e
     except AppError as e:
         detail = str(e) or "Bad request"
         raise HTTPException(status.HTTP_400_BAD_REQUEST,detail=detail) from e
-    
+
     

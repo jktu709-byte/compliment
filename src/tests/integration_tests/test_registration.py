@@ -1,20 +1,22 @@
-import pytest #noqa
+import pytest 
 from httpx import AsyncClient
 from src.users.repository import UserRepository
+from src.users.service import UserService
 
-
-async def test_register(client:AsyncClient,service:UserRepository):
-    response = await client.post(
-        "users/register",
+@pytest.fixture
+def user_service(test_session):
+    return UserService(repo=UserRepository(test_session))
+@pytest.mark.asyncio
+async def test_register(client:AsyncClient,user_service):
+    response = await client.post(url="users/register",
         json={
             "name":"John",
-            "email":"john@example.com",
+            "email":"john123@example.com",
             "gender":"male",
-            "password":"exapmlepassword123"
-        }
+            "password":"exapmlepassword123"}
     )
     assert response.status_code == 200
-    user = await service.get_user_by_email(email="john@example.com")
+    user = await user_service.get_user_by_email(email="john123@example.com")
     assert user is not None
     assert user.name == "John"
     assert user.password_hash != "exapmlepassword123"

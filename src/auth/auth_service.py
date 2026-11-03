@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 
 from src.auth.auth_config import auth_settings
 from src.auth.auth_repository import AuthRepository
@@ -51,7 +51,7 @@ class AuthService:
         if not stored or stored.revoked:
             raise RefreshTokenNotFoundError()
         # прописываем удаление токена
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         if stored.expires_at <= now:
              #можно удалить пакетами через cron
              await self.auth_repo.delete_refresh_token(stored) 
@@ -66,7 +66,7 @@ class AuthService:
 
     def _refresh_expiry(self) -> datetime:
         """Продлевает токен по мере расходования"""
-        return datetime.now(timezone.utc) + timedelta(minutes=auth_settings.refresh_token_expires_minutes)
+        return datetime.now(UTC) + timedelta(minutes=auth_settings.refresh_token_expires_minutes)
     # здесь собирается токен для последующего использования в логине
     async def _issue_tokens(self, user_id: int) -> TokenPairSchema:
         access_token = token_helper.create_access_token(user_id)

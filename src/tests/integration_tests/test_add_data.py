@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.schemas.comp_schemas import ComplimentAppendDTO
+from src.models.comp_models import Gender
 from src.tests.factory.complmnt_factory import Complmnt_Factory
 
 
@@ -13,10 +13,9 @@ def complmnt_factory(test_session:AsyncSession) -> Complmnt_Factory:
     return Complmnt_Factory(test_session)
     
 @pytest.mark.asyncio 
-async def test_add_data(factory:Complmnt_Factory):
-    complmnt = ComplimentAppendDTO
-    res = await factory.create_complmnt()
-    assert  complmnt.title == res.title
-    assert complmnt.gender == res.gender
-    assert complmnt.point == res.point
+async def test_add_data(complmnt_factory):
+    res = await complmnt_factory.create_complmnt()
+    assert  res.title == "test_title"
+    assert res.gender == Gender.neutral
+    assert res.point == "test_point"
     return res
