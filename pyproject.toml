@@ -23,6 +23,7 @@ asyncio = "^4.0.0"
 pytest-asyncio = "^1.4.0"
 httpx = "^0.28.1"
 alembic = "^1.20.0"
+python-dotenv = "^1.2.4"
 
 
 [tool.poetry.group.dev.dependencies]

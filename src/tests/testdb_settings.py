@@ -27,4 +27,4 @@ class TESTDBSettings(BaseSettings):
             username=self.POSTGRES_USER
             )
 # Продакшн
-db_settings = TESTDBSettings() # type: ignore
+test_db_settings = TESTDBSettings() # type: ignore

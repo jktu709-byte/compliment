@@ -8,14 +8,16 @@ config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
-    
+# подумай как прописать alembic отдельным процессом, чтобы event loop при вызове не ломать
 dburl = db_settings.db_url.update_query_dict({"async_fallback":"true"})
-# Дело в том, что базовый URL функция не принимает и поэтому приходится парсить url как строку. +"?async_fallback = True"
+# Дело в том, что базовый URL функция не принимает и поэтому приходится парсить url как строку
+# прописать запуск с тестовыми переменными
 config.set_main_option("sqlalchemy.url",dburl.render_as_string(hide_password=False).replace("%","%%"))
 target_metadata = BDBase.metadata
 
 def run_migrations_offline() -> None:
     url = config.get_main_option("sqlalchemy.url",dburl.render_as_string(hide_password=False).replace("%","%%"))
+    
     context.configure(
         url=url,
         target_metadata=target_metadata,

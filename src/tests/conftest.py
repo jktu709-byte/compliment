@@ -1,7 +1,10 @@
 # Здесь подготавливается окружение, переменные, ресурсы, состояния для тестирования
-from collections.abc import AsyncGenerator  # noqa: F401
+import os
+import subprocess
+import sys  
 import pytest_asyncio,pytest
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -9,25 +12,35 @@ from sqlalchemy.ext.asyncio import (
 )
 from src.core.database import create_engine_factory, get_session
 from src.main import app
-from src.models.comp_models import BDBase 
+from src.models.comp_models import BDBase
 from src.tests.factory.user_factory import User_Factory
 from src.tests.testdb_settings import TESTDBSettings
+from dotenv import dotenv_values
 
-
-@pytest.fixture
+@pytest.fixture(scope="session")
 def test_url():
     settings = TESTDBSettings() # type: ignore
     assert settings.POSTGRES_DB.startswith("test_")
     return settings.test_db_url
-
+# прописать alembic upgrade head, вместо колхозного create_all
 @pytest_asyncio.fixture
-async def test_engine(test_url):
+async def test_engine(test_url,migrated_db):
     t_engine = create_engine_factory(test_url)
-    async with t_engine.begin() as connection:
-        await connection.run_sync(BDBase.metadata.create_all)
     yield t_engine
+    tables = ", ".join(f'"{t.name}"' for t in BDBase.metadata.sorted_tables)
+    async with t_engine.begin() as conn:
+        await conn.execute(text(f"TRUNCATE {tables} RESTART IDENTITY CASCADE"))
     # dispose закрывает все используемые соеднинения
     await t_engine.dispose()
+# выполняет инициализацию бд вместо колхозного create_all
+@pytest.fixture
+def migrated_db(test_url):
+    subprocess.run(
+        [sys.executable, "-m", "alembic", "upgrade", "head"],
+        env={**os.environ, **dotenv_values("tests.env")}, # type: ignore
+        check=True,
+    ) # type: ignore
+    yield
     
 @pytest_asyncio.fixture
 async def test_session(test_engine:AsyncEngine):
