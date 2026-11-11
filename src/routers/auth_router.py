@@ -66,7 +66,4 @@ async def refresh_token(data:RefreshRequest,response:Response,service:AuthServic
     _set_cookies_settings(response,access_token=pair.access_token,refresh_token=pair.refresh_token)
     return pair
 
-# @auth_router.get("/me")
-# async def get_me():
-#     res = get_user_from_bearer()
-#     return res
+
