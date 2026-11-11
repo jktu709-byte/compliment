@@ -42,7 +42,7 @@ async def login(data:LoginRequestSchema,response:Response,service:AuthService = 
         # вводим данные 
         acces,refresh = await service.login(data.email,data.password)
     # при неверном вводе пароля или логина выкидываем ошибку
-    except InvalidCredentialsError as e:
+    except (InvalidCredentialsError, UserNotFoundError) as e:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED,detail=str(e)) from e
     # ловим любую другую ошибку(надо будет сделать более детальные ошибки)
     except AppError as e:
