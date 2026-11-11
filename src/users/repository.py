@@ -18,8 +18,8 @@ class UserRepository:
     #     )
     #     return querry
     
-    async def add_history(self,user_id:int): 
-        self.session.add(instance=History) #instance= куда добавить, конкретно что добавляем
+    async def add_history(self, history: History):
+        self.session.add(history)
     
     async def get_user_by_name(self,name:str)-> Result[tuple[User]]|None: 
         return await self.session.execute(

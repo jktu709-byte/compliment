@@ -45,7 +45,7 @@ async def get_user_compliment(user_id:int,service:ComplimentService = Depends(ge
 @compl_router.get("/data/all",response_model= ComplimentListResponse)
 async def compliments_list(service: ComplimentService = Depends(get_compl_service)):
     res = await service.list_compliments()
-    return res
+    return ComplimentListResponse(compliments=res)
 # payload  = put,post   
 @compl_router.put("/data/{compliment_id}")
 async def update_compliment(compliment_id:int,service:ComplimentService = Depends(get_compl_service)):
@@ -54,9 +54,7 @@ async def update_compliment(compliment_id:int,service:ComplimentService = Depend
         raise HTTPException(status_code=404, detail="This compliment doesn't exist")
     return res
 
-@compl_router.get("/history/{user_id}",response_model=ComplimentResponse)
+@compl_router.get("/history/{user_id}",response_model=list[ComplimentResponse])
 async def get_user_history(user_id:int,service:ComplimentService = Depends(get_compl_service)):
     res = await service.get_history(user_id=user_id)
-    if res is ComplimentNotFoundError():
-        raise HTTPException(status_code= 204, detail=ComplimentNotFoundError.msg)
     return res

@@ -42,7 +42,7 @@ async def login(data:LoginRequestSchema,response:Response,service:AuthService = 
         # вводим данные 
         acces,refresh = await service.login(data.email,data.password)
     # при неверном вводе пароля или логина выкидываем ошибку
-    except InvalidCredentialsError as e:
+    except (InvalidCredentialsError, UserNotFoundError) as e:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED,detail=str(e)) from e
     # ловим любую другую ошибку(надо будет сделать более детальные ошибки)
     except AppError as e:
@@ -66,7 +66,4 @@ async def refresh_token(data:RefreshRequest,response:Response,service:AuthServic
     _set_cookies_settings(response,access_token=pair.access_token,refresh_token=pair.refresh_token)
     return pair
 
-# @auth_router.get("/me")
-# async def get_me():
-#     res = get_user_from_bearer()
-#     return res
+

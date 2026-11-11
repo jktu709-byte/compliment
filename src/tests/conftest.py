@@ -37,7 +37,7 @@ async def test_engine(test_url,migrated_db):
 def migrated_db(test_url):
     subprocess.run(
         [sys.executable, "-m", "alembic", "upgrade", "head"],
-        env={**os.environ, **dotenv_values("tests.env")}, # type: ignore
+        env={**dotenv_values("tests.env"), **os.environ}, # type: ignore
         check=True,
     ) # type: ignore
     yield

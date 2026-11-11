@@ -8,7 +8,7 @@ from src.models.comp_models import RefreshToken
 
 class AuthRepository:
     def __init__(self,session:AsyncSession) -> None:
-                self.session = session
+        self.session = session
     # добавлять токены в бд не надо, просто отправляй их клиенту, потом надо будет разбираться где их хранить - в локалке или же в куках
     async def create_refresh_token(self, user_id:int, token_hash: str, expires:datetime):
         refresh_token = RefreshToken(
@@ -28,7 +28,7 @@ class AuthRepository:
             .where(RefreshToken.token_hash == token_hash))
     
     async def delete_refresh_token(self,token_obj:RefreshToken):
-        return self.session.delete(token_obj)
+        return await self.session.delete(token_obj)
     
     async def commit(self):
-            await self.session.commit()
+        await self.session.commit()

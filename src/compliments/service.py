@@ -43,7 +43,7 @@ class ComplimentService:
         await self.repo.commit()
         print(f"Данные добавлены успешно: {len(entities)}")       
         
-    async def get_compliment_for_user(self,user_id:int) -> int|None:
+    async def get_compliment_for_user(self,user_id:int) -> Compliment:
         # нужен объект класса, иначе сессия не воркает
         # Check all compliments
         all_compliments = await self.repo.get_all_compliments()
@@ -51,7 +51,8 @@ class ComplimentService:
         if not all_compliments:
             raise ComplimentNotFoundError("Compliments does not exists")
         # check history
-        set_history_ids = await self.u_repo.get_user_history(user_id= user_id)
+        history = await self.u_repo.get_user_history(user_id=user_id)
+        set_history_ids = {row.compliment_id for row in history}
         # check available
         available = [compliment for compliment in all_compliments if compliment.id not in set_history_ids]
         # if available emptyh -> return all
@@ -62,10 +63,10 @@ class ComplimentService:
         # history note 
         history_row = History(compliment_id = chosen.id, user_id = user_id)
         # save history
-        await self.u_repo.add_history(user_id=history_row.user_id)
+        await self.u_repo.add_history(history_row)
         # save all
         await self.repo.commit()
-        return chosen # type: ignore
+        return chosen
     
     async def list_compliments(self) -> list[Compliment]:
         res = await self.repo.get_all_compliments()
@@ -73,11 +74,11 @@ class ComplimentService:
             raise ComplimentNotFoundError("Список комплиментов не был найден")
         return res
     
-    async def get_history(self,user_id:int):
-        list_history = self.u_repo.get_user_history(user_id=user_id)
+    async def get_history(self,user_id:int) -> list[Compliment]:
+        list_history = await self.u_repo.get_user_history(user_id=user_id)
         if not list_history:
             raise ComplimentNotFoundError("Комплимент(ы) не был(и) найден(ы)")
-        return list_history
+        return [row.compliment for row in list_history]
     
     async def change_compliment(self,comp_id:int):
         # достаю данные
