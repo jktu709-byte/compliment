@@ -13,3 +13,4 @@ my_multiprocessing.py
 backups
 .gitlab-ci.yml
 tests
+/docs

@@ -1,0 +1,134 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  tests:
+    name: Integration tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      POSTGRES_DB: test_compliment
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: '5434'
+      POSTGRES_USER: fakeuser
+      POSTGRES_PASSWORD: fakepassword
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: test_compliment
+          POSTGRES_USER: fakeuser
+          POSTGRES_PASSWORD: fakepassword
+        ports:
+          - 5434:5432
+        options: >-
+          --health-cmd "pg_isready -U fakeuser -d test_compliment"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install dependencies from lock file
+        run: |
+          python -m pip install poetry==1.8.2
+          poetry install --no-root --without dev --no-interaction
+      - name: Generate a key for this test run
+        run: |
+          python - <<'PY'
+          import os
+          import secrets
+          with open(os.environ['GITHUB_ENV'], 'a') as env_file:
+              env_file.write(f'SECRET_KEY={secrets.token_hex(32)}\n')
+          PY
+      - name: Run tests and migrations against the temporary database
+        run: poetry run pytest src/tests/integration_tests --junitxml=test-results.xml
+      - name: Save test results even if tests fail
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: test-results.xml
+          retention-days: 7
+
+  sast:
+    name: Python security scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install Bandit
+        run: python -m pip install bandit==1.9.4
+      # Block medium/high-severity findings with at least medium confidence.
+      - name: Scan application code
+        run: bandit -r src -x src/tests -ll -ii
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Scan Git history without printing secret values
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" \
+            -v "$GITHUB_WORKSPACE:/repo:ro" \
+            ghcr.io/gitleaks/gitleaks:v8.30.1 \
+            git /repo --redact --no-banner
+
+  image:
+    name: Build image
+    needs: [tests, sast, secrets]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Determine lowercase image name
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v4
+      - name: Log in to GitHub Container Registry
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build; publish only from main
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.image.outputs.name }}:sha-${{ github.sha }}
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
