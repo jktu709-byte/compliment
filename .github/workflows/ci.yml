@@ -1,5 +1,5 @@
 name: CI
-
+# условия запуска
 on:
   pull_request:
     branches: [main]
@@ -12,18 +12,22 @@ permissions:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-
+# этап тестирования
 jobs:
   tests:
+    # название этапа
     name: Integration tests
+    # на чем запускать
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    # переменные окружения для тестов
     env:
       POSTGRES_DB: test_compliment
       POSTGRES_HOST: 127.0.0.1
       POSTGRES_PORT: '5434'
       POSTGRES_USER: fakeuser
       POSTGRES_PASSWORD: fakepassword
+    # сервис, который нужен для тестов
     services:
       postgres:
         image: postgres:16
@@ -38,7 +42,9 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
+    # описываются шаги
     steps:
+      # Базовая команда на получение репозитория
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
@@ -66,7 +72,7 @@ jobs:
           name: test-results
           path: test-results.xml
           retention-days: 7
-
+  # Проверка python-кода
   sast:
     name: Python security scan
     runs-on: ubuntu-24.04
@@ -83,7 +89,7 @@ jobs:
       # Block medium/high-severity findings with at least medium confidence.
       - name: Scan application code
         run: bandit -r src -x src/tests -ll -ii
-
+  # Проверка на наличие секретов в коде
   secrets:
     name: Secret scan
     runs-on: ubuntu-24.04
