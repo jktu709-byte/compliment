@@ -1,6 +1,7 @@
 import pytest
 import pytest_asyncio
-
+from unittest.mock import AsyncMock 
+from src.compliments.repository import ComplimentRepository  
 from src.models.comp_models import Compliment, Gender
 
 
@@ -29,8 +30,16 @@ async def test_list_compliments_when_empty(client):
 
 @pytest.mark.asyncio
 async def test_list_compliments(client, test_session):
-    compliment = Compliment(title="You are kind", gender=Gender.neutral, point="Kindness")
+    compliment = Compliment(
+        title="You are kind", 
+        gender=Gender.neutral, 
+        point="Kindness"
+        )
     test_session.add(compliment)
+    repo = ComplimentRepository() # type: ignore
+    read = AsyncMock(return_value = compliment,wraps=repo.get_all_compliments)
+    result = await read()
+    assert result.await_count == 1
     await test_session.commit()
 
     response = await client.get("/compliments/data/all")

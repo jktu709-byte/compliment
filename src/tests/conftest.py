@@ -17,6 +17,8 @@ from src.tests.factory.user_factory import User_Factory
 from src.tests.testdb_settings import TESTDBSettings
 from dotenv import dotenv_values
 
+from src.utils.depends import get_redis_client
+
 @pytest.fixture(scope="session")
 def test_url():
     settings = TESTDBSettings() # type: ignore
@@ -62,7 +64,27 @@ async def test_user(user_factory,test_session:AsyncSession):
     return base_test_user
 
 @pytest_asyncio.fixture
-async def client(test_engine:AsyncEngine):
+async def test_cache():
+    # объект для тестов
+    class TestCache:
+        def __init__(self):
+            self.data = {}
+            self.ttl = {}
+
+        async def get(self, key):
+            return self.data.get(key)
+
+        async def set(self, key, value, *, ex):
+            self.data[key] = value
+            self.ttl[key] = ex
+    test_cache_dict = TestCache()
+    return test_cache_dict
+    # имеет атрбиуты set(), где назначает пару ключ-значение и время жизни
+    # и get(), с помощью которого может доставать пару ключ-значение
+    
+
+@pytest_asyncio.fixture
+async def client(test_engine:AsyncEngine,test_cache):
     # создаю генератор сессий
     tengine = async_sessionmaker(test_engine,class_=AsyncSession,expire_on_commit=False)
     # функция перезаписи сессии
@@ -71,6 +93,7 @@ async def client(test_engine:AsyncEngine):
             yield session
     # перезаписываю основную сессию на тестовую 
     app.dependency_overrides[get_session] = override_session
+    app.dependency_overrides[get_redis_client] = lambda: test_cache
     # стандартное создание клиента
     async with AsyncClient(transport=ASGITransport(app=app),base_url="https://tests") as async_client:
         yield async_client
