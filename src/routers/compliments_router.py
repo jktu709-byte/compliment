@@ -1,6 +1,5 @@
 # This is something like DTO, naybe transport stuff
 # Think about addresses
-from typing import Annotated
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile  # noqa: F401
 from src.compliments.service import ComplimentService
 from src.decorators.conn_deco import require_db_conn
@@ -45,7 +44,7 @@ async def get_user_compliment(user_id:int,service:ComplimentService = Depends(ge
 @compl_router.get("/data/all",response_model= ComplimentListResponse)
 async def compliments_list(service: ComplimentService = Depends(get_compl_service)):
     res = await service.list_compliments()
-    return ComplimentListResponse(compliments=res)
+    return res
 # payload  = put,post   
 @compl_router.put("/data/{compliment_id}")
 async def update_compliment(compliment_id:int,service:ComplimentService = Depends(get_compl_service)):

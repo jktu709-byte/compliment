@@ -1,4 +1,5 @@
-from fastapi import Depends, HTTPException,Request,status 
+from fastapi import Depends, HTTPException,Request,status
+from redis.asyncio import Redis 
 from src.compliments.repository import ComplimentRepository
 from src.auth.auth_repository import AuthRepository
 from src.users.repository import UserRepository
@@ -13,16 +14,20 @@ from src.auth.tokens import token_helper
 from src.exceptions.semantic_exceptions import RefreshTokenNotFoundError, UserNotFoundError
 from src.models.comp_models import User
 
+def get_redis_client(req:Request):
+        return req.app.state.redis
+        
 def get_compl_repo(session:AsyncSession = Depends(get_session))-> ComplimentRepository:
         return ComplimentRepository(session)
 
 def get_user_repo(session:AsyncSession = Depends(get_session))-> UserRepository:
         return UserRepository(session)                                    
 def get_compl_service(
+        u_cache:Redis = Depends(get_redis_client),
         complmnt_repo:ComplimentRepository = Depends(get_compl_repo),
-        u_repo:UserRepository = Depends(get_user_repo)
-        )->ComplimentService:
-        return ComplimentService(repo=complmnt_repo,u_repo=u_repo)
+        u_repo:UserRepository = Depends(get_user_repo),
+        ):
+        return ComplimentService(repo=complmnt_repo,u_repo=u_repo,cache=u_cache)
                                     
 def get_user_service(repo:UserRepository = Depends(get_user_repo))->UserService:
         return UserService(repo)
