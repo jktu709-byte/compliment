@@ -9,14 +9,17 @@ from src.exceptions.semantic_exceptions import (
     ComplimentNotFoundError,
 )
 from src.models.comp_models import Compliment, Gender, History  #noqa
-from src.schemas.comp_schemas import ComplimentAppendDTO
+from src.schemas.comp_schemas import ComplimentAppendDTO, ComplimentListResponse, ComplimentResponse
 from src.users.repository import UserRepository
+from redis.asyncio import Redis
 
-
+COMPLIMENT_KEY = "complmnts:all:v1"
+CACHE_SEC_TTL = 90
 class ComplimentService:
-    def __init__(self,repo:ComplimentRepository,u_repo:UserRepository):
+    def __init__(self,repo:ComplimentRepository,u_repo:UserRepository,cache:Redis):
         self.repo = repo
         self.u_repo = u_repo
+        self.cache = cache
     # подумать над целесообразностью async в cpu задаче
     async def input_data_from_file(
         self,
@@ -24,23 +27,26 @@ class ComplimentService:
         ):
         # получаем данные на входе(файл) и распаковываем их
         data = json.load(file.file)
-        
         if "compliments" not in data:
             raise KeyError
         # простенькая валидация на всякую бяку  
         valid_data = [ComplimentAppendDTO.model_validate(item) for item in data["compliments"]]
         # если ничего не передали - дальше не идем, возвращаем None
         print(type(valid_data))
-        
         if not valid_data:
             return "No data"  
         # Если данные есть пробуем занести их в базу
-        entities = [Compliment(title = i.title,point = i.point,gender = i.gender) for i in valid_data]
-        
+        entities = [
+            Compliment(
+                title = i.title,
+                point = i.point,
+                gender = i.gender) 
+            for i in valid_data]
         print(entities[0])
         # Добавляем/сохраняем
         await self.repo.add_list(compliments=entities)
-        await self.repo.commit()
+        await self.repo.commit()                     # изменение успешно сохранено в БД
+        await self.cache.delete(COMPLIMENT_KEY) # прежний список больше не выдаём
         print(f"Данные добавлены успешно: {len(entities)}")       
         
     async def get_compliment_for_user(self,user_id:int) -> Compliment:
@@ -68,11 +74,29 @@ class ComplimentService:
         await self.repo.commit()
         return chosen
     
-    async def list_compliments(self) -> list[Compliment]:
+    async def list_compliments(self) -> ComplimentListResponse:
+        # вызываем кэш
+        cached_res = await self.cache.get(COMPLIMENT_KEY)
+        # если кэш есть - валиируем и выдаем
+        if cached_res is not None:
+            return ComplimentListResponse.model_validate_json(cached_res)
+        # Если кэша нет - прыгаем в бд
         res = await self.repo.get_all_compliments()
+        # Отлов пустой бд
         if not res:
             raise ComplimentNotFoundError("Список комплиментов не был найден")
-        return res
+        # Достаем и упаковываем данные через list comprehension
+        responce = ComplimentListResponse(
+            compliments=[
+                ComplimentResponse.model_validate(row) 
+                for row in res]
+            )
+        # Назначаем ключи под которыми хранятся данные
+        await self.cache.set(
+            COMPLIMENT_KEY,responce.model_dump_json(),
+            ex=CACHE_SEC_TTL
+            )
+        return responce
     
     async def get_history(self,user_id:int) -> list[Compliment]:
         list_history = await self.u_repo.get_user_history(user_id=user_id)
