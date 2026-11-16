@@ -6,6 +6,7 @@ from src.users.service import UserService
 @pytest.fixture
 def user_service(test_session):
     return UserService(repo=UserRepository(test_session))
+
 @pytest.mark.asyncio
 async def test_register(client:AsyncClient,user_service):
     response = await client.post(url="users/register",

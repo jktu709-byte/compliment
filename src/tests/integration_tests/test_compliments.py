@@ -1,6 +1,7 @@
 import pytest
 import pytest_asyncio
-
+from unittest.mock import AsyncMock
+from src.compliments.repository import ComplimentRepository
 from src.models.comp_models import Compliment, Gender
 
 
@@ -28,14 +29,25 @@ async def test_list_compliments_when_empty(client):
 
 
 @pytest.mark.asyncio
-async def test_list_compliments(client, test_session):
-    compliment = Compliment(title="You are kind", gender=Gender.neutral, point="Kindness")
+async def test_list_compliments(client, test_session,monkeypatch):
+    compliment = Compliment(
+        title="You are kind",
+        gender=Gender.neutral,
+        point="Kindness"
+        )
     test_session.add(compliment)
     await test_session.commit()
-
+# Mock подменяет функцию и автоматически считывает количество своих вызовов
+    read = AsyncMock(wraps=ComplimentRepository.get_all_compliments)
+    # прописываю mock как self метод класса
+    def replacement(self):
+        return read(self)
+    # вынуждаю полльзоваться им
+    monkeypatch.setattr(ComplimentRepository, "get_all_compliments", replacement)
     response = await client.get("/compliments/data/all")
 
     assert response.status_code == 200, response.text
+    assert read.await_count == 1
     compliments = response.json()["compliments"]
     assert len(compliments) == 1
     assert compliments[0]["id"] == compliment.id
@@ -43,7 +55,10 @@ async def test_list_compliments(client, test_session):
     assert compliments[0]["gender"] == "neutral"
     assert compliments[0]["point"] == "Kindness"
     assert compliments[0]["created_at"]
-
+    second_response = await client.get("/compliments/data/all")
+    assert second_response.status_code == 200, second_response.text
+    assert response.json() == second_response.json()
+    assert read.await_count ==1
 
 @pytest.mark.asyncio
 async def test_random_compliment_when_empty(client, reader_id):
