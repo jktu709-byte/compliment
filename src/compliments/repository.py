@@ -19,8 +19,7 @@ class ComplimentRepository:
         return obj
     
     async def add_list(self, compliments:list[Compliment]):
-        res = self.session.add_all(compliments)
-        await res # type: ignore
+        res = self.session.add_all(compliments)  # noqa: F841
          
     async def get_compliment(self,complmnt_id:int)->Compliment|None:
         res = await self.session.execute(
