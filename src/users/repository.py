@@ -1,9 +1,11 @@
 
+import datetime
+
 from sqlalchemy import Result, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.models.comp_models import Compliment, Gender, History, User
+from src.models.comp_models import Compliment, Gender, History, User, EmailVerificationToken
 
 
 class UserRepository:
@@ -44,6 +46,16 @@ class UserRepository:
         await self.session.flush()
         return user
     
+    async def create_email_verification_token(self,user_id:int,expires:datetime.datetime,token_hash:str):
+        res = EmailVerificationToken(
+            user_id=user_id,
+            token_hash=token_hash,
+            expires_at = expires
+            )
+        self.session.add(res)
+        await self.session.flush()
+        return res
+
     async def get_all_users(self):
         return await self.session.execute(select(User))
         

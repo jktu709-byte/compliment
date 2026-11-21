@@ -8,7 +8,8 @@ def user_service(test_session):
     return UserService(repo=UserRepository(test_session))
 
 @pytest.mark.asyncio
-async def test_register(client:AsyncClient,user_service):
+async def test_register(client:AsyncClient,user_service,caplog):
+    caplog.set_level("INFO", logger="sqlalchemy.engine.Engine")
     response = await client.post(url="users/register",
         json={
             "name":"John",
@@ -17,10 +18,14 @@ async def test_register(client:AsyncClient,user_service):
             "password":"exapmlepassword123"}
     )
     assert response.status_code == 201
+    assert set(response.json()) == {"id", "name", "created_at"}
     user = await user_service.get_email("john123@example.com")
     assert user is not None
     assert user.name == "John"
+    assert user.email_verified_at is None
     assert user.password_hash != "exapmlepassword123"
+    assert "SQL parameters hidden" in caplog.text
+    assert not any(user.password_hash in message for message in caplog.messages)
 
 
 @pytest.mark.asyncio
