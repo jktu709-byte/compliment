@@ -7,6 +7,7 @@ from src.core.db_config import db_settings
 def create_engine_factory(some_url:URL)->AsyncEngine:
     engine = create_async_engine(
         echo=True,
+        hide_parameters=True,
         url = some_url,
         pool_size= 10,
         max_overflow=20,

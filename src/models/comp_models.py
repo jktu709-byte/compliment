@@ -37,6 +37,7 @@ class User(BDBase):
     name:Mapped[str] = mapped_column(nullable=False,index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     email:Mapped[str] = mapped_column(String,unique=True,index= True)
+    email_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     gender:Mapped[Gender] = mapped_column(nullable=False,index=True)
     # status:Mapped[Status]= mapped_column(nullable=True)
     # role:Mapped[Role] = mapped_column(nullable=False)
@@ -61,4 +62,9 @@ class RefreshToken(BDBase):
     revoked:Mapped[bool] = mapped_column(Boolean,default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     user: Mapped[User] = relationship(back_populates="refresh_tokens")    
-#В планах добавить табличку Context, где будут обьяснятся примеры и контекст
+
+class EmailVerificationToken(BDBase):
+    __tablename__ = "email_verification_token"
+    user_id:Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"),primary_key=True)
+    token_hash:Mapped[str] = mapped_column(String,nullable=False,unique=True)
+    expires_at:Mapped[datetime] = mapped_column(DateTime(timezone=True))
