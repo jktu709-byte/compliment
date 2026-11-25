@@ -27,6 +27,9 @@ jobs:
       POSTGRES_PORT: '5434'
       POSTGRES_USER: fakeuser
       POSTGRES_PASSWORD: fakepassword
+      # Celery settings are loaded during import; publishing is mocked in tests.
+      RABBITMQ_USER: testuser
+      RABBITMQ_PASSWORD: testpassword
     # сервис, который нужен для тестов
     services:
       postgres:
