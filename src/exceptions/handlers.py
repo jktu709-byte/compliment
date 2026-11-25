@@ -4,7 +4,7 @@ from functools import wraps #noqa
 from fastapi import Request
 from fastapi.responses import JSONResponse
 
-from src.exceptions.semantic_exceptions import AppError, ComplimentAlreadyExistsError, ComplimentNotFoundError, InvalidCredentialsError, RefreshTokenExpiredError, RefreshTokenNotFoundError, UserAlreadyExistsError, UserNotFoundError
+from src.exceptions.semantic_exceptions import AppError, ComplimentAlreadyExistsError, ComplimentNotFoundError, InvalidCredentialsError, InvalidEmailVerificationTokenError, RefreshTokenExpiredError, RefreshTokenNotFoundError, UserAlreadyExistsError, UserNotFoundError
 # мапа для соотношения разных ошибок и статус кодов
 ERROR_STATUS_CODES = {
     UserNotFoundError: 404,
@@ -14,6 +14,7 @@ ERROR_STATUS_CODES = {
     RefreshTokenExpiredError: 401,
     ComplimentAlreadyExistsError: 409,
     ComplimentNotFoundError: 404,
+    InvalidEmailVerificationTokenError: 400
 }
 
 async def app_error_hadler(req:Request,exc:AppError) -> JSONResponse:
@@ -22,13 +23,6 @@ async def app_error_hadler(req:Request,exc:AppError) -> JSONResponse:
         status_code=status_code,
         content={"code":exc.code,"msg":exc.msg}
     )
-
-# идею с классом реализую возможно позже
-# class ExceptionHandler:
-    
-#     def __init__(self) -> None:
-#         pass
-    
 
     
     

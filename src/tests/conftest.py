@@ -2,6 +2,7 @@
 import os
 import subprocess
 import sys  
+from unittest.mock import Mock
 import pytest_asyncio,pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
@@ -18,6 +19,14 @@ from src.tests.testdb_settings import TESTDBSettings
 from dotenv import dotenv_values
 
 from src.utils.depends import get_redis_client
+
+@pytest.fixture(autouse=True)
+def email_task_mock(monkeypatch):
+    from src.users.service import send_email
+
+    publish = Mock()
+    monkeypatch.setattr(send_email, "delay", publish)
+    return publish
 
 @pytest.fixture(scope="session")
 def test_url():

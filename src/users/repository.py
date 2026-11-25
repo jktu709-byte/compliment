@@ -56,6 +56,19 @@ class UserRepository:
         await self.session.flush()
         return res
 
+    async def get_email_verification_token_by_hash(
+        self, token_hash: str
+    ) -> EmailVerificationToken | None:
+        stmt = (
+            select(EmailVerificationToken)
+            .where(EmailVerificationToken.token_hash == token_hash)
+            .with_for_update()
+        )
+        return await self.session.scalar(stmt)
+
+    async def delete_email_verification_token(self, token: EmailVerificationToken) -> None:
+        await self.session.delete(token)
+
     async def get_all_users(self):
         return await self.session.execute(select(User))
         

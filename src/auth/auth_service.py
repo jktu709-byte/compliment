@@ -46,7 +46,7 @@ class AuthService:
             return user
     
     async def _get_valid_refresh(self,raw_token:str):
-        token_hash = token_helper.hash_session_token(raw_token)
+        token_hash = token_helper.hash_token(raw_token)
         stored = await self.auth_repo.get_refresh_token(token_hash=token_hash)
         if not stored or stored.revoked:
             raise RefreshTokenNotFoundError()
@@ -71,7 +71,7 @@ class AuthService:
     async def _issue_tokens(self, user_id: int) -> TokenPairSchema:
         access_token = token_helper.create_access_token(user_id)
         refresh_token = token_helper.create_refresh_token()
-        refresh_hash = token_helper.hash_session_token(refresh_token)
+        refresh_hash = token_helper.hash_token(refresh_token)
         expires_at = self._refresh_expiry()
         await self.auth_repo.create_refresh_token(user_id=user_id,token_hash=refresh_hash,expires=expires_at)
         await self.auth_repo.commit()

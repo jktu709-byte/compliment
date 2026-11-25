@@ -1,6 +1,6 @@
 import hashlib
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, UTC
 
 import jwt
 from src.auth.auth_config import auth_settings
@@ -11,12 +11,12 @@ class TokenHelper:
     def __init__(self) -> None:
         self.secret_key = auth_settings.jwt_secret_key
         
-    def generate_sesion_token(self) -> tuple[str,str]:
+    def generate_token(self) -> tuple[str,str]:
         """Создает пару значений (сырой токен, хэш)"""
         token = secrets.token_urlsafe(32)
-        return token,self.hash_session_token(token)
+        return token,self.hash_token(token)
     
-    def hash_session_token(self,token:str):
+    def hash_token(self,token:str):
         """Хэширует токен c помощью SHA-256"""
         return hashlib.sha256(token.encode("utf-8")).hexdigest()
     
@@ -29,6 +29,7 @@ class TokenHelper:
         return secrets.token_urlsafe(50)
         
     def decode_token(self,token) -> dict:
+        """Декодирует токен"""
         payload = jwt.decode(jwt=token) # type: ignore #токен, ключ, алгоритм шифрования
         return payload
     
@@ -38,7 +39,7 @@ class TokenHelper:
     token_type: str,
     expires_minutes: int):
         """Собирает JWT с указанным типом и временем жизни."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         expires = now + timedelta(minutes=expires_minutes)
 
         payload = {
