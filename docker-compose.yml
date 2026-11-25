@@ -38,6 +38,7 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
+      network: "${DOCKER_BUILD_NETWORK:-default}"
     environment:
       - PYTHONPATH=/app
     hostname: POSTGRES_HOST
@@ -83,6 +84,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      network: "${DOCKER_BUILD_NETWORK:-default}"
     env_file:
       - ./.env
     command: celery -A src.celery.tasks:celery_app worker --loglevel=info
@@ -94,6 +96,7 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile 
+      network: "${DOCKER_BUILD_NETWORK:-default}"
     ports:
       - 8000:8000
     container_name: compliment
