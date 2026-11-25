@@ -18,8 +18,9 @@ class LoginRequestSchema(BaseModel):
     name: str
     email:str
     password: str
-
-class UserRead(BaseModel):
+class EmailRequestSchema(BaseModel):
+    token:str
+class UserReadSchema(BaseModel):
     id: int
     name: str
     created_at: datetime
@@ -37,4 +38,4 @@ class RefreshRequest(BaseModel):
 
 
 class SessionLoginResponse(BaseModel):
-    user: UserRead
+    user: UserReadSchema

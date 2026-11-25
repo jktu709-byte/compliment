@@ -22,6 +22,10 @@ class UserNotFoundError(AppError):
     code = "USER_NOT_FOUND"
     msg = "User not found"
 
+class InvalidEmailVerificationTokenError(AppError):
+    code = "INVALID_EMAIL_VERIFICATION_TOKEN"
+    msg = "Email verification token is invalid or expired"
+
 class RefreshTokenNotFoundError(AppError):
     """Рефреш токен не найден или отозван."""
     code = "REFRESH_TOKEN_NOT_FOUND"

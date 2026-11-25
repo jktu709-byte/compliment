@@ -1,5 +1,9 @@
+from datetime import UTC, datetime, timedelta
+
 import pytest 
 from httpx import AsyncClient
+from src.auth.tokens import token_helper
+from src.models.comp_models import EmailVerificationToken, User
 from src.users.repository import UserRepository
 from src.users.service import UserService
 
@@ -57,3 +61,46 @@ async def test_register_rejects_invalid_payload(client: AsyncClient, payload):
     response = await client.post("/users/register", json=payload)
 
     assert response.status_code == 422, response.text
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("expired", [False, True], ids=["valid-and-reused", "expired"])
+async def test_confirm_email(client, test_session, email_task_mock, expired):
+    registration = await client.post("/users/register", json={
+        "name": "Reader", "email": "reader@example.com",
+        "gender": "neutral", "password": "password123",
+    })
+    assert registration.status_code == 201, registration.text
+    email_task_mock.assert_called_once()
+    message = email_task_mock.call_args.kwargs
+    assert message["to_email"] == "reader@example.com"
+    raw_token = message["body"]
+    user_id = registration.json()["id"]
+    token = await test_session.get(EmailVerificationToken, user_id)
+    assert token.token_hash == token_helper.hash_token(raw_token)
+    assert token.token_hash != raw_token
+    if expired:
+        token.expires_at = datetime.now(UTC) - timedelta(seconds=1)
+        await test_session.commit()
+
+    response = await client.post("/users/confirm_email", json={"token": raw_token})
+    assert response.status_code == (400 if expired else 204), response.text
+    test_session.expire_all()
+    user = await test_session.get(User, user_id)
+    if expired:
+        assert user.email_verified_at is None
+        assert response.json()["code"] == "INVALID_EMAIL_VERIFICATION_TOKEN"
+    else:
+        assert response.content == b""
+        assert user.email_verified_at is not None
+        assert await test_session.get(EmailVerificationToken, user_id) is None
+        repeated = await client.post("/users/confirm_email", json={"token": raw_token})
+        assert repeated.status_code == 400
+        assert repeated.json()["code"] == "INVALID_EMAIL_VERIFICATION_TOKEN"
+
+
+@pytest.mark.asyncio
+async def test_confirm_email_rejects_unknown_token(client):
+    response = await client.post("/users/confirm_email", json={"token": "unknown-token"})
+    assert response.status_code == 400, response.text
+    assert response.json()["code"] == "INVALID_EMAIL_VERIFICATION_TOKEN"
