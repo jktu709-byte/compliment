@@ -1,5 +1,5 @@
 from smtplib import SMTP
-
+from socket import gaierror
 from celery import Celery
 from email.message import EmailMessage
 from src.celery.config import celery_settings
@@ -12,8 +12,16 @@ celery_app = Celery(
 def print_message(text:str):
     print(text)
 
+celery_app.conf.beat_schedule = {
+    "print-every-50-seconds": {
+        "task": "src.celery.tasks.print_message",
+        "schedule": 50.0,
+        "args": ("Я как будильник звоню каждые 50 секунд",),
+    }
+}
+
 @celery_app.task(
-    autoretry_for = (ConnectionError,TimeoutError),
+    autoretry_for = (ConnectionError,TimeoutError,gaierror),
     retry_backoff = 10,
     retry_jitter = False,
     max_retries = 2
