@@ -1,5 +1,5 @@
 from smtplib import SMTP
-
+from socket import gaierror
 from celery import Celery
 from email.message import EmailMessage
 from src.celery.config import celery_settings
@@ -13,7 +13,7 @@ def print_message(text:str):
     print(text)
 
 @celery_app.task(
-    autoretry_for = (ConnectionError,TimeoutError),
+    autoretry_for = (ConnectionError,TimeoutError,gaierror),
     retry_backoff = 10,
     retry_jitter = False,
     max_retries = 2
